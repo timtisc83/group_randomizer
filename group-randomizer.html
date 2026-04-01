@@ -35,6 +35,7 @@
       padding: 14px 28px;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.12);
       position: relative;
@@ -47,6 +48,7 @@
       width: 160px; height: 160px;
       border: 2px solid rgba(255,255,255,0.18);
       transform: rotate(15deg);
+      pointer-events: none;
     }
     #header::after {
       content: '';
@@ -55,23 +57,41 @@
       width: 100px; height: 100px;
       border: 2px dashed rgba(255,255,255,0.12);
       transform: rotate(30deg);
+      pointer-events: none;
     }
-    .header-logo {
-      width: 52px;
-      flex-shrink: 0;
-      filter: brightness(0) invert(1);
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .header-wordmark {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+    .header-divider {
+      width: 1.5px;
+      height: 32px;
+      background: rgba(255,255,255,0.35);
     }
     .header-title {
       color: var(--white);
-      font-size: 1.25rem;
-      font-weight: 700;
-      letter-spacing: -0.3px;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.2px;
     }
     .header-sub {
-      color: rgba(255,255,255,0.82);
-      font-size: 0.75rem;
+      color: rgba(255,255,255,0.75);
+      font-size: 0.7rem;
       font-weight: 400;
       margin-top: 1px;
+    }
+    .header-mode-badge {
+      background: rgba(255,255,255,0.18);
+      color: white;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      display: none;
     }
 
     /* ── LAYOUT ── */
@@ -118,7 +138,7 @@
       background: var(--white);
       border: 1.5px solid #e4e4e4;
       border-radius: 16px;
-      padding: 28px 28px;
+      padding: 24px 24px;
       margin-bottom: 20px;
       position: relative;
       overflow: hidden;
@@ -131,15 +151,15 @@
       background: var(--turquoise);
     }
     .card-title {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
       color: var(--blue);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .card-sub {
       font-size: 0.82rem;
       color: #666;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     /* ── SCREEN: SETUP ── */
@@ -192,15 +212,10 @@
       gap: 12px;
       margin-bottom: 20px;
     }
-    .num-label {
-      font-size: 0.9rem;
-      font-weight: 600;
-      flex: 1;
-    }
+    .num-label { font-size: 0.9rem; font-weight: 600; flex: 1; }
     .num-ctrl {
       display: flex;
       align-items: center;
-      gap: 0;
       border: 1.5px solid var(--turquoise);
       border-radius: 10px;
       overflow: hidden;
@@ -213,8 +228,8 @@
       font-size: 1.2rem;
       cursor: pointer;
       font-weight: 700;
-      transition: background 0.2s;
       display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
     }
     .num-btn:hover { background: #00a8ba; }
     .num-val {
@@ -226,15 +241,12 @@
       border: none;
       color: var(--blue);
       font-family: inherit;
+      outline: none;
     }
     .num-val::-webkit-inner-spin-button { display: none; }
 
     /* ── REMAINDER OPTIONS ── */
-    .remainder-opts {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .remainder-opts { display: flex; gap: 10px; flex-wrap: wrap; }
     .rem-opt {
       padding: 9px 16px;
       border-radius: 10px;
@@ -247,93 +259,97 @@
       color: #555;
       transition: all 0.2s;
     }
-    .rem-opt.active {
-      border-color: var(--blue);
-      background: var(--blue);
-      color: white;
-    }
+    .rem-opt.active { border-color: var(--blue); background: var(--blue); color: white; }
 
     /* ── BUTTONS ── */
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 13px 28px;
-      border-radius: 12px;
-      border: none;
-      font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 8px; padding: 13px 28px;
+      border-radius: 12px; border: none;
+      font-family: inherit; font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
     }
-    .btn-primary {
-      background: var(--blue);
-      color: var(--white);
-    }
+    .btn-primary { background: var(--blue); color: var(--white); }
     .btn-primary:hover { background: #0f2fd4; transform: translateY(-1px); }
-    .btn-turquoise {
-      background: var(--turquoise);
-      color: var(--white);
-    }
+    .btn-turquoise { background: var(--turquoise); color: var(--white); }
     .btn-turquoise:hover { background: #00a8ba; transform: translateY(-1px); }
-    .btn-outline {
-      background: transparent;
-      color: var(--blue);
-      border: 1.5px solid var(--blue);
-    }
+    .btn-outline { background: transparent; color: var(--blue); border: 1.5px solid var(--blue); }
     .btn-outline:hover { background: var(--blue); color: white; }
-    .btn-ghost {
-      background: #f0f0f0;
-      color: #555;
-    }
+    .btn-ghost { background: #f0f0f0; color: #555; }
     .btn-ghost:hover { background: #e0e0e0; }
-    .btn-danger {
-      background: var(--red);
-      color: white;
-    }
+    .btn-danger { background: var(--red); color: white; }
     .btn-danger:hover { background: #e03d3d; }
     .btn-full { width: 100%; }
     .btn-big { padding: 16px 32px; font-size: 1.05rem; }
     .btn-sm { padding: 7px 14px; font-size: 0.78rem; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
 
-    /* ── SCREEN: SIGN-UP ── */
-    .signup-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      gap: 12px;
+    /* ── SIGN-UP WALL ── */
+    .signup-wall {
+      background: var(--light-bg);
+      border: 2px dashed var(--turquoise);
+      border-radius: 20px;
+      padding: 28px 24px 20px;
+      text-align: center;
+      margin-bottom: 20px;
     }
-    .name-input-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
+    .signup-wall-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 4px;
     }
-    .name-input {
-      flex: 1;
-      padding: 12px 16px;
-      border: 1.5px solid #ddd;
-      border-radius: 10px;
+    .signup-wall-sub {
+      font-size: 0.82rem;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    .big-name-input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px solid #ddd;
+      border-radius: 14px;
       font-family: inherit;
-      font-size: 0.95rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      text-align: center;
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      margin-bottom: 12px;
+      color: var(--black);
     }
-    .name-input:focus { border-color: var(--turquoise); }
+    .big-name-input:focus {
+      border-color: var(--turquoise);
+      box-shadow: 0 0 0 3px rgba(0,193,212,0.15);
+    }
+    .big-name-input.error {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(255,79,79,0.12);
+    }
+    .input-hint {
+      font-size: 0.75rem;
+      color: #999;
+      margin-top: 6px;
+    }
+    .input-error-msg {
+      font-size: 0.8rem;
+      color: var(--red);
+      font-weight: 600;
+      min-height: 18px;
+      margin-bottom: 4px;
+    }
+
+    /* ── STUDENT LIST ── */
     .student-list {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      min-height: 60px;
+      min-height: 56px;
       padding: 16px;
-      background: var(--light-bg);
+      background: white;
       border-radius: 12px;
-      border: 1.5px dashed var(--turquoise);
-      margin-top: 8px;
+      border: 1.5px solid #eee;
+      margin-top: 16px;
     }
     .student-chip {
       display: inline-flex;
@@ -352,32 +368,26 @@
       to { transform: scale(1); opacity: 1; }
     }
     .chip-remove {
-      background: rgba(255,255,255,0.25);
-      border: none;
-      color: white;
+      background: rgba(255,255,255,0.22);
+      border: none; color: white;
       border-radius: 50%;
       width: 18px; height: 18px;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       font-weight: 900;
-      line-height: 1;
     }
     .chip-remove:hover { background: rgba(255,255,255,0.4); }
 
     .count-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--turquoise);
-      color: white;
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 0.8rem;
-      font-weight: 700;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--turquoise); color: white;
+      border-radius: 20px; padding: 4px 14px;
+      font-size: 0.82rem; font-weight: 700;
     }
+    .empty-state { text-align: center; color: #aaa; font-size: 0.83rem; padding: 8px; width: 100%; }
 
-    /* Group preview info box */
+    /* ── INFO BOX ── */
     .info-box {
       background: #f9f9f9;
       border-left: 4px solid var(--turquoise);
@@ -390,24 +400,14 @@
     }
     .info-box strong { color: var(--blue); }
 
-    /* ── SCREEN: RESULT ── */
-    .result-header {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-    .result-header h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--blue);
-    }
-    .result-header p {
-      color: #666;
-      font-size: 0.9rem;
-      margin-top: 4px;
-    }
+    /* ── RESULT ── */
+    .result-header { text-align: center; margin-bottom: 36px; }
+    .result-header h2 { font-size: 2rem; font-weight: 700; color: var(--blue); }
+    .result-header p { color: #666; font-size: 0.9rem; margin-top: 4px; }
+
     .groups-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
       gap: 16px;
       margin-bottom: 32px;
     }
@@ -423,47 +423,28 @@
       bottom: -20px; right: -20px;
       width: 80px; height: 80px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.08);
     }
     .group-card-title {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      opacity: 0.75;
-      margin-bottom: 10px;
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.2px;
+      opacity: 0.75; margin-bottom: 10px;
     }
     .group-card-number {
-      font-size: 2rem;
-      font-weight: 700;
-      opacity: 0.2;
-      position: absolute;
-      top: 10px; right: 14px;
-      line-height: 1;
+      font-size: 2.2rem; font-weight: 700;
+      opacity: 0.15; position: absolute;
+      top: 8px; right: 14px; line-height: 1;
     }
-    .group-members {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
+    .group-members { list-style: none; display: flex; flex-direction: column; gap: 5px; }
     .group-members li {
-      font-size: 0.9rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 7px;
+      font-size: 0.88rem; font-weight: 600;
+      display: flex; align-items: center; gap: 7px;
     }
     .group-members li::before {
       content: '';
-      display: inline-block;
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.7);
-      flex-shrink: 0;
+      display: inline-block; width: 6px; height: 6px;
+      border-radius: 50%; background: rgba(255,255,255,0.65); flex-shrink: 0;
     }
-
-    /* Group color themes */
     .gc-0 { background: var(--blue); color: white; }
     .gc-1 { background: var(--turquoise); color: white; }
     .gc-2 { background: var(--violet); color: white; }
@@ -475,17 +456,11 @@
     .gc-8 { background: #2C7873; color: white; }
 
     .result-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
     }
 
-    /* ── ANIMATION ── */
-    .shuffle-anim {
-      text-align: center;
-      padding: 48px 0;
-    }
+    /* ── SHUFFLE ANIM ── */
+    .shuffle-anim { text-align: center; padding: 60px 0; }
     .shuffle-spinner {
       width: 64px; height: 64px;
       border: 5px solid var(--gray);
@@ -499,61 +474,45 @@
     /* ── UTILITY ── */
     .mt-12 { margin-top: 12px; }
     .mt-20 { margin-top: 20px; }
-    .mt-28 { margin-top: 28px; }
     .flex { display: flex; }
     .gap-10 { gap: 10px; }
-    .align-center { align-items: center; }
-    .justify-between { justify-content: space-between; }
-    .w-100 { width: 100%; }
+    .divider { border: none; border-top: 1.5px solid #eee; margin: 16px 0; }
     .text-muted { color: #888; font-size: 0.82rem; }
-    .divider {
-      border: none;
-      border-top: 1.5px solid #eee;
-      margin: 20px 0;
+
+    /* ── HOST CONTROLS ── */
+    .host-bar {
+      background: #fafafa;
+      border: 1.5px solid #eee;
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .host-bar-label {
+      font-size: 0.78rem;
+      color: #888;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    /* ── GEOMETRIC DECORATIONS ── */
-    .geo-deco {
-      position: absolute;
-      pointer-events: none;
+    /* ── PRINT ── */
+    @media print {
+      #header, #steps, .result-actions, .host-bar { display: none !important; }
+      body { background: white; }
+      #app { padding: 0; max-width: 100%; }
     }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 520px) {
       .groups-grid { grid-template-columns: 1fr 1fr; }
       .big-heading { font-size: 1.4rem; }
-      #header { padding: 12px 16px; }
       #app { padding: 20px 14px 50px; }
-    }
-
-    /* ── PRINT ── */
-    @media print {
-      #header, #steps, .result-actions, #back-btn { display: none !important; }
-      body { background: white; }
-      #app { padding: 0; max-width: 100%; }
-      .groups-grid { break-inside: avoid; }
-    }
-
-    /* ── EMPTY STATE ── */
-    .empty-state {
-      text-align: center;
-      color: #aaa;
-      font-size: 0.85rem;
-      padding: 12px;
-    }
-
-    /* info pill */
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--light-bg);
-      border: 1px solid var(--turquoise);
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--blue);
+      .header-sub { display: none; }
     }
   </style>
 </head>
@@ -561,26 +520,19 @@
 
 <!-- HEADER -->
 <div id="header">
-  <!-- ODCE Logo solid, white filter -->
-  <svg class="header-logo" viewBox="0 0 96.605103 82.199448" xmlns="http://www.w3.org/2000/svg">
-    <g transform="translate(117.23172,-149.41432)">
-      <path style="fill:#ffffff;stroke:none" d="m -116.43796,230.55898 59.621691,0.26104 h 6.8089 l 27.00638,-23.65599 v -50.64865 l -38.93207,0.22247 -54.504901,21.22023 z"/>
-      <g style="fill:#00C1D4">
-        <path d="m -102.06223,223.39662 c 4.504274,0 7.270058,-2.6275 7.270058,-7.32933 0,-4.70183 -2.765784,-7.32933 -7.270058,-7.32933 -4.52404,0 -7.28982,2.6275 -7.28982,7.32933 0,4.70183 2.76578,7.32933 7.28982,7.32933 z m 0,-3.14114 c -2.23239,0 -3.65479,-1.56069 -3.65479,-4.18819 0,-2.62749 1.4224,-4.18819 3.65479,-4.18819 2.212624,0 3.635027,1.5607 3.635027,4.18819 0,2.6275 -1.422403,4.18819 -3.635027,4.18819 z"/>
-        <path d="m -93.783207,223.12004 h 6.183503 c 3.753564,0 6.795927,-1.89654 6.795927,-7.05275 0,-5.15621 -3.042363,-7.05275 -6.795927,-7.05275 h -6.183503 z m 5.294501,-3.12138 h -1.857026 v -7.86273 h 1.857026 c 3.239919,0 4.049898,1.34338 4.049898,3.93136 0,2.58799 -0.809979,3.93137 -4.049898,3.93137 z"/>
-        <path d="m -73.05818,223.39662 c 3.101629,0 6.440326,-1.81752 6.637882,-5.84766 h -3.654786 c -0.217312,1.85703 -1.698982,2.70652 -2.983096,2.70652 -2.15336,0 -3.496741,-1.44216 -3.496741,-4.20794 0,-2.72628 1.343381,-4.16844 3.496741,-4.16844 1.284114,0 2.78554,0.82974 2.983096,2.70652 h 3.654786 c -0.197556,-4.0499 -3.536253,-5.84766 -6.637882,-5.84766 -4.286965,0 -7.131771,2.54848 -7.131771,7.30958 0,4.80061 2.844806,7.34908 7.131771,7.34908 z"/>
-        <path d="m -65.411352,223.12004 h 10.806313 v -3.12138 h -7.368838 v -2.37068 h 6.381058 v -3.12138 h -6.381058 v -2.37067 h 7.27006 v -3.12139 h -10.707535 z"/>
-      </g>
-    </g>
-  </svg>
-  <div>
-    <div class="header-title">Group Randomizer</div>
-    <div class="header-sub">Institute for Organizational Design and Collaboration Engineering · TUHH</div>
+  <div class="header-left">
+    <div class="header-wordmark">ODCE</div>
+    <div class="header-divider"></div>
+    <div>
+      <div class="header-title">Group Randomizer</div>
+      <div class="header-sub">TU Hamburg · Institut für Organisationsdesign und Collaborative Engineering</div>
+    </div>
   </div>
+  <div class="header-mode-badge" id="mode-badge">Host View</div>
 </div>
 
-<!-- STEP INDICATOR -->
 <div id="app">
+  <!-- STEP DOTS -->
   <div id="steps">
     <div class="step-dot active" id="s1">1</div>
     <div class="step-line" id="l1"></div>
@@ -589,30 +541,25 @@
     <div class="step-dot" id="s3">3</div>
   </div>
 
-  <!-- ════════════════════════════════════════
-       SCREEN 1: SETUP
-  ════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════
+       SCREEN 1 — SETUP
+  ══════════════════════════════════ -->
   <div class="screen active" id="screen-setup">
     <h1 class="big-heading">Set up your <span>groups.</span></h1>
-    <p class="lead">Choose how you want to divide students, then let the randomizer do the rest.</p>
+    <p class="lead">Choose how you want to divide students — then open the sign-up screen and let students add their own names.</p>
 
     <div class="card">
       <div class="card-title">Group Mode</div>
       <div class="card-sub">Define groups by number of groups — or by students per group.</div>
       <div class="toggle-group">
-        <button class="toggle-btn active" id="mode-num-groups" onclick="setMode('numGroups')">
-          # of Groups
-        </button>
-        <button class="toggle-btn" id="mode-per-group" onclick="setMode('perGroup')">
-          Students per Group
-        </button>
+        <button class="toggle-btn active" id="mode-num-groups" onclick="setMode('numGroups')"># of Groups</button>
+        <button class="toggle-btn" id="mode-per-group" onclick="setMode('perGroup')">Students per Group</button>
       </div>
-
       <div class="num-row">
         <span class="num-label" id="num-label">Number of groups</span>
         <div class="num-ctrl">
           <button class="num-btn" onclick="changeNum(-1)">−</button>
-          <input class="num-val" type="number" id="num-val" value="4" min="1" max="99" oninput="updatePreview()">
+          <input class="num-val" type="number" id="num-val" value="4" min="1" max="99" oninput="syncNum()">
           <button class="num-btn" onclick="changeNum(1)">+</button>
         </div>
       </div>
@@ -622,88 +569,80 @@
       <div class="card-title">Remainder Handling</div>
       <div class="card-sub">What should happen if students don't divide evenly?</div>
       <div class="remainder-opts">
-        <button class="rem-opt active" id="rem-smaller" onclick="setRemainder('smaller')">
-          ↙ Make one group smaller
-        </button>
-        <button class="rem-opt" id="rem-bigger" onclick="setRemainder('bigger')">
-          ↗ Make one group bigger
-        </button>
-        <button class="rem-opt" id="rem-distribute" onclick="setRemainder('distribute')">
-          ⚖ Distribute evenly
-        </button>
+        <button class="rem-opt active" id="rem-smaller" onclick="setRemainder('smaller')">↙ One group smaller</button>
+        <button class="rem-opt" id="rem-bigger" onclick="setRemainder('bigger')">↗ One group bigger</button>
+        <button class="rem-opt" id="rem-distribute" onclick="setRemainder('distribute')">⚖ Distribute evenly</button>
       </div>
-    </div>
-
-    <div class="info-box" id="setup-preview">
-      Configure settings above, then add students in the next step.
     </div>
 
     <button class="btn btn-primary btn-full btn-big mt-12" onclick="goToSignup()">
-      Next: Add Students →
+      Open Sign-Up Screen →
     </button>
   </div>
 
-  <!-- ════════════════════════════════════════
-       SCREEN 2: SIGN-UP
-  ════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════
+       SCREEN 2 — SIGN-UP WALL
+  ══════════════════════════════════ -->
   <div class="screen" id="screen-signup">
-    <div class="signup-header">
-      <div>
-        <h2 style="font-size:1.6rem;font-weight:700;color:var(--black)">Add Students</h2>
-        <p class="text-muted mt-12">Type a name and press Enter or click Add</p>
-      </div>
-      <div>
-        <span class="count-badge">
-          <span id="student-count">0</span> students
-        </span>
-      </div>
-    </div>
 
-    <div class="card">
-      <div class="name-input-row">
-        <input
-          class="name-input"
-          type="text"
-          id="name-input"
-          placeholder="Student name…"
-          onkeydown="handleNameKey(event)"
-          autocomplete="off"
-        >
-        <button class="btn btn-turquoise" onclick="addStudent()">Add</button>
+    <!-- HOST controls bar -->
+    <div class="host-bar">
+      <div>
+        <div class="host-bar-label">Host Controls</div>
+        <div style="font-size:0.82rem;color:#555;margin-top:2px;">Students type their name below — display this screen for everyone to see.</div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-ghost btn-sm" onclick="pasteNames()">📋 Paste list</button>
+      <div class="flex gap-10" style="flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="goBack(1)">← Settings</button>
         <button class="btn btn-ghost btn-sm" onclick="clearAll()">🗑 Clear all</button>
-      </div>
-      <hr class="divider">
-      <div class="student-list" id="student-list">
-        <div class="empty-state" id="empty-msg">No students yet — add some above</div>
+        <button class="btn btn-primary btn-sm" id="randomize-btn" onclick="goToRandomize()" disabled>Randomize 🎲</button>
       </div>
     </div>
 
-    <div class="info-box" id="signup-preview">
-      Add students to see the group preview.
-    </div>
-
-    <div class="flex gap-10 mt-20">
-      <button class="btn btn-outline" onclick="goBack(1)">← Back</button>
-      <button class="btn btn-primary" style="flex:1" onclick="goToRandomize()" id="randomize-btn" disabled>
-        Randomize Groups 🎲
+    <!-- THE SIGN-UP WALL (students interact here) -->
+    <div class="signup-wall">
+      <div class="signup-wall-title">✍️ Enter your name</div>
+      <div class="signup-wall-sub">Type your name and press <strong>Enter</strong> or tap <strong>Sign Up</strong></div>
+      <input
+        class="big-name-input"
+        type="text"
+        id="name-input"
+        placeholder="Your name…"
+        onkeydown="handleNameKey(event)"
+        oninput="clearInputError()"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+        maxlength="40"
+      >
+      <div class="input-error-msg" id="error-msg"></div>
+      <button class="btn btn-turquoise btn-full" onclick="addStudent()" style="font-size:1rem;padding:14px;">
+        Sign Up
       </button>
+      <div class="input-hint">Press Enter or tap Sign Up · Your name will appear below</div>
+    </div>
+
+    <!-- Count + info -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+      <span class="count-badge"><span id="student-count">0</span> students signed up</span>
+      <span class="info-box" style="margin:0;flex:1;margin-left:16px;" id="signup-preview">Add at least 2 students to enable randomization.</span>
+    </div>
+
+    <!-- Live student list -->
+    <div class="student-list" id="student-list">
+      <div class="empty-state" id="empty-msg">No students yet — be the first to sign up!</div>
     </div>
   </div>
 
-  <!-- ════════════════════════════════════════
-       SCREEN 3: RESULT
-  ════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════
+       SCREEN 3 — RESULT
+  ══════════════════════════════════ -->
   <div class="screen" id="screen-result">
-    <!-- Shuffle animation (shown briefly) -->
+
     <div class="shuffle-anim" id="shuffle-anim">
       <div class="shuffle-spinner"></div>
       <p style="font-weight:600;color:var(--blue);font-size:1rem;">Shuffling groups…</p>
     </div>
 
-    <!-- Actual result (hidden until ready) -->
     <div id="result-content" style="display:none">
       <div class="result-header">
         <h2>Groups are ready! 🎉</h2>
@@ -711,10 +650,10 @@
       </div>
       <div class="groups-grid" id="groups-grid"></div>
       <div class="result-actions">
-        <button class="btn btn-outline" onclick="goBack(2)">← Edit Students</button>
+        <button class="btn btn-outline" onclick="goBack(2)">← Back to Sign-Up</button>
         <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
         <button class="btn btn-turquoise" onclick="reshuffleGroups()">🔀 Re-shuffle</button>
-        <button class="btn btn-primary" onclick="goBack(1)">Start Over</button>
+        <button class="btn btn-primary" onclick="freshStart()">Start Over</button>
       </div>
     </div>
   </div>
@@ -724,9 +663,9 @@
 <script>
 // ── STATE ──
 const state = {
-  mode: 'numGroups',        // 'numGroups' | 'perGroup'
+  mode: 'numGroups',
   num: 4,
-  remainder: 'smaller',     // 'smaller' | 'bigger' | 'distribute'
+  remainder: 'smaller',
   students: [],
 };
 
@@ -737,112 +676,26 @@ function setMode(m) {
   document.getElementById('mode-per-group').classList.toggle('active', m === 'perGroup');
   document.getElementById('num-label').textContent =
     m === 'numGroups' ? 'Number of groups' : 'Students per group';
-  updatePreview();
 }
 
 // ── NUMBER CONTROL ──
-function changeNum(delta) {
+function changeNum(d) {
   const el = document.getElementById('num-val');
-  let v = parseInt(el.value) + delta;
+  let v = (parseInt(el.value) || 1) + d;
   if (v < 1) v = 1;
   el.value = v;
   state.num = v;
-  updatePreview();
 }
-
-document.getElementById('num-val').addEventListener('input', () => {
+function syncNum() {
   state.num = parseInt(document.getElementById('num-val').value) || 1;
-  updatePreview();
-});
+}
 
 // ── REMAINDER ──
 function setRemainder(r) {
   state.remainder = r;
-  ['smaller','bigger','distribute'].forEach(x => {
-    document.getElementById('rem-' + x).classList.toggle('active', x === r);
-  });
-  updatePreview();
+  ['smaller','bigger','distribute'].forEach(x =>
+    document.getElementById('rem-' + x).classList.toggle('active', x === r));
   updateSignupPreview();
-}
-
-// ── PREVIEW TEXT ──
-function computeGroups(n) {
-  if (n === 0) return [];
-  const total = n;
-  const num = state.num;
-  let groupCount, baseSize;
-
-  if (state.mode === 'numGroups') {
-    groupCount = num;
-    baseSize = Math.floor(total / groupCount);
-  } else {
-    baseSize = num;
-    groupCount = Math.floor(total / baseSize);
-    if (groupCount < 1) groupCount = 1;
-  }
-
-  const remainder = total - baseSize * groupCount;
-
-  // Build size array
-  let sizes = Array(groupCount).fill(baseSize);
-  if (remainder > 0) {
-    if (state.remainder === 'bigger') {
-      // Add extra students to first group
-      sizes[0] += remainder;
-    } else if (state.remainder === 'smaller') {
-      // One group gets the leftovers (will be smaller if remainder < baseSize)
-      // Actually: remainder students form an extra smaller group or we shrink
-      // Interpretation: remainder students are added as a smaller group
-      if (state.mode === 'numGroups') {
-        // Last group is smaller — remove from last group
-        sizes[sizes.length - 1] = remainder;
-      } else {
-        // Add a smaller group
-        sizes.push(remainder);
-      }
-    } else {
-      // Distribute: spread remainder across groups evenly
-      for (let i = 0; i < remainder; i++) {
-        sizes[i % groupCount]++;
-      }
-    }
-  }
-  return sizes;
-}
-
-function updatePreview() {
-  const n = state.students.length;
-  const num = parseInt(document.getElementById('num-val').value) || 1;
-  state.num = num;
-  const label = state.mode === 'numGroups' ? 'groups' : 'students per group';
-  document.getElementById('setup-preview').innerHTML =
-    `With <strong>${num} ${label}</strong> and your remainder setting, groups will be formed once you add students.`;
-}
-
-function updateSignupPreview() {
-  const n = state.students.length;
-  document.getElementById('student-count').textContent = n;
-  const btn = document.getElementById('randomize-btn');
-  btn.disabled = n < 2;
-
-  if (n < 2) {
-    document.getElementById('signup-preview').innerHTML = 'Add at least 2 students to enable randomization.';
-    return;
-  }
-
-  const sizes = computeGroups(n);
-  const gc = sizes.length;
-  const sizeDesc = [...new Set(sizes)].sort((a,b)=>a-b).join(' or ');
-  let remNote = '';
-  if (new Set(sizes).size > 1) {
-    if (state.remainder === 'smaller') remNote = 'One group will be smaller.';
-    else if (state.remainder === 'bigger') remNote = 'One group will be larger.';
-    else remNote = 'Sizes distributed as evenly as possible.';
-  } else {
-    remNote = 'All groups are equal size.';
-  }
-  document.getElementById('signup-preview').innerHTML =
-    `<strong>${n} students</strong> → <strong>${gc} group${gc>1?'s':''}</strong> of <strong>${sizeDesc} student${sizeDesc==='1'?'':'s'}</strong>. ${remNote}`;
 }
 
 // ── NAVIGATION ──
@@ -850,7 +703,6 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
 }
-
 function updateSteps(step) {
   [1,2,3].forEach(i => {
     const d = document.getElementById('s' + i);
@@ -858,18 +710,15 @@ function updateSteps(step) {
     if (i < step) d.classList.add('done');
     else if (i === step) d.classList.add('active');
   });
-  [1,2].forEach(i => {
-    const l = document.getElementById('l' + i);
-    l.classList.toggle('done', i < step);
-  });
+  [1,2].forEach(i =>
+    document.getElementById('l' + i).classList.toggle('done', i < step));
 }
-
 function goToSignup() {
+  syncNum();
   updateSteps(2);
   showScreen('signup');
   document.getElementById('name-input').focus();
 }
-
 function goToRandomize() {
   if (state.students.length < 2) return;
   updateSteps(3);
@@ -878,57 +727,59 @@ function goToRandomize() {
   document.getElementById('result-content').style.display = 'none';
   setTimeout(renderGroups, 900);
 }
-
 function goBack(to) {
   updateSteps(to);
   showScreen(to === 1 ? 'setup' : 'signup');
-  if (to === 1) updatePreview();
-  if (to === 2) updateSignupPreview();
+  if (to === 2) {
+    updateSignupPreview();
+    setTimeout(() => document.getElementById('name-input').focus(), 100);
+  }
+}
+function freshStart() {
+  state.students = [];
+  renderChips();
+  updateSignupPreview();
+  updateSteps(1);
+  showScreen('setup');
 }
 
 // ── STUDENTS ──
 function handleNameKey(e) {
   if (e.key === 'Enter') addStudent();
 }
+function clearInputError() {
+  const inp = document.getElementById('name-input');
+  inp.classList.remove('error');
+  document.getElementById('error-msg').textContent = '';
+}
+function showInputError(msg) {
+  const inp = document.getElementById('name-input');
+  inp.classList.add('error');
+  document.getElementById('error-msg').textContent = msg;
+  inp.focus();
+}
 
 function addStudent() {
   const input = document.getElementById('name-input');
   const name = input.value.trim();
-  if (!name) return;
-  if (state.students.includes(name)) {
-    input.style.borderColor = 'var(--red)';
-    setTimeout(() => input.style.borderColor = '', 1000);
+  if (!name) { showInputError('Please enter your name.'); return; }
+  const nameLower = name.toLowerCase();
+  if (state.students.some(s => s.toLowerCase() === nameLower)) {
+    showInputError(`"${name}" is already signed up!`);
     return;
   }
   state.students.push(name);
   input.value = '';
+  clearInputError();
   renderChips();
   updateSignupPreview();
   input.focus();
 }
 
-function removeStudent(name) {
-  state.students = state.students.filter(s => s !== name);
+function removeStudent(idx) {
+  state.students.splice(idx, 1);
   renderChips();
   updateSignupPreview();
-}
-
-function renderChips() {
-  const list = document.getElementById('student-list');
-  const empty = document.getElementById('empty-msg');
-  list.innerHTML = '';
-  if (state.students.length === 0) {
-    list.appendChild(empty);
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-  state.students.forEach(name => {
-    const chip = document.createElement('div');
-    chip.className = 'student-chip';
-    chip.innerHTML = `${esc(name)}<button class="chip-remove" onclick="removeStudent('${esc(name).replace(/'/g,"\\'")}')">✕</button>`;
-    list.appendChild(chip);
-  });
 }
 
 function clearAll() {
@@ -939,24 +790,71 @@ function clearAll() {
   updateSignupPreview();
 }
 
-async function pasteNames() {
-  const text = await navigator.clipboard.readText().catch(() => null);
-  let input;
-  if (text) {
-    input = text;
-  } else {
-    input = prompt('Paste student names (one per line or comma-separated):');
-    if (!input) return;
+function renderChips() {
+  const list = document.getElementById('student-list');
+  list.innerHTML = '';
+  if (state.students.length === 0) {
+    list.innerHTML = '<div class="empty-state" id="empty-msg">No students yet — be the first to sign up!</div>';
+    return;
   }
-  const names = input
-    .split(/[\n,;]+/)
-    .map(s => s.trim())
-    .filter(s => s.length > 0);
-  names.forEach(n => {
-    if (!state.students.includes(n)) state.students.push(n);
+  state.students.forEach((name, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'student-chip';
+    chip.innerHTML = `${esc(name)}<button class="chip-remove" onclick="removeStudent(${i})" title="Remove">✕</button>`;
+    list.appendChild(chip);
   });
-  renderChips();
-  updateSignupPreview();
+}
+
+// ── PREVIEW ──
+function computeSizes(total) {
+  if (total === 0) return [];
+  const num = state.num;
+  let groupCount, baseSize;
+  if (state.mode === 'numGroups') {
+    groupCount = Math.max(1, Math.min(num, total));
+    baseSize = Math.floor(total / groupCount);
+  } else {
+    baseSize = Math.max(1, num);
+    groupCount = Math.max(1, Math.floor(total / baseSize));
+  }
+  const remainder = total - baseSize * groupCount;
+  let sizes = Array(groupCount).fill(baseSize);
+  if (remainder > 0) {
+    if (state.remainder === 'bigger') {
+      sizes[0] += remainder;
+    } else if (state.remainder === 'smaller') {
+      if (state.mode === 'numGroups') {
+        sizes[sizes.length - 1] = remainder;
+      } else {
+        sizes.push(remainder);
+      }
+    } else {
+      for (let i = 0; i < remainder; i++) sizes[i % groupCount]++;
+    }
+  }
+  return sizes;
+}
+
+function updateSignupPreview() {
+  const n = state.students.length;
+  document.getElementById('student-count').textContent = n;
+  const btn = document.getElementById('randomize-btn');
+  btn.disabled = n < 2;
+  if (n < 2) {
+    document.getElementById('signup-preview').innerHTML = 'Add at least 2 students to enable randomization.';
+    return;
+  }
+  const sizes = computeSizes(n);
+  const gc = sizes.length;
+  const unique = [...new Set(sizes)].sort((a,b)=>a-b);
+  const sizeDesc = unique.join(' or ');
+  let remNote = new Set(sizes).size > 1
+    ? (state.remainder === 'bigger' ? 'One group will be larger.' :
+       state.remainder === 'smaller' ? 'One group will be smaller.' :
+       'Sizes distributed evenly.')
+    : 'All groups are equal size.';
+  document.getElementById('signup-preview').innerHTML =
+    `<strong>${n} students</strong> → <strong>${gc} group${gc>1?'s':''}</strong> of <strong>${sizeDesc}</strong>. ${remNote}`;
 }
 
 // ── GROUPS ──
@@ -969,31 +867,26 @@ function shuffle(arr) {
   return a;
 }
 
-function buildGroups(students) {
-  const shuffled = shuffle(students);
-  const sizes = computeGroups(shuffled.length);
+function buildGroups() {
+  const shuffled = shuffle(state.students);
+  const sizes = computeSizes(shuffled.length);
   const groups = [];
   let idx = 0;
   sizes.forEach((size, i) => {
-    groups.push({
-      number: i + 1,
-      members: shuffled.slice(idx, idx + size),
-    });
+    groups.push({ number: i + 1, members: shuffled.slice(idx, idx + size) });
     idx += size;
   });
   return groups;
 }
 
 function renderGroups() {
-  const groups = buildGroups(state.students);
+  const groups = buildGroups();
   document.getElementById('shuffle-anim').style.display = 'none';
   document.getElementById('result-content').style.display = 'block';
-
-  const gc = groups.length;
   const n = state.students.length;
+  const gc = groups.length;
   document.getElementById('result-summary').textContent =
-    `${n} student${n>1?'s':''} → ${gc} group${gc>1?'s':''}`;
-
+    `${n} student${n>1?'s':''} divided into ${gc} group${gc>1?'s':''}`;
   const grid = document.getElementById('groups-grid');
   grid.innerHTML = '';
   groups.forEach((g, i) => {
@@ -1002,10 +895,7 @@ function renderGroups() {
     card.innerHTML = `
       <div class="group-card-number">${g.number}</div>
       <div class="group-card-title">Group ${g.number}</div>
-      <ul class="group-members">
-        ${g.members.map(m => `<li>${esc(m)}</li>`).join('')}
-      </ul>
-    `;
+      <ul class="group-members">${g.members.map(m=>`<li>${esc(m)}</li>`).join('')}</ul>`;
     grid.appendChild(card);
   });
 }
@@ -1020,9 +910,6 @@ function reshuffleGroups() {
 function esc(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
-// ── INIT ──
-updatePreview();
 </script>
 </body>
 </html>
