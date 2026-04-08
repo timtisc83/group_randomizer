@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Group Randomizer | ODCE</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ODCE Group Mixer</title>
+
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root {
       --turquoise: #00C1D4;
@@ -12,950 +18,340 @@
       --violet: #7200FE;
       --mint: #5AFFC5;
       --red: #FF4F4F;
-      --orange: #FF7E15;
-      --white: #FFFFFF;
-      --black: #000000;
-      --gray: #D0D0CE;
-      --light-bg: #F4FEFF;
-      --card-bg: #FAFAFA;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Poppins', 'Segoe UI', sans-serif;
-      background: var(--white);
-      color: var(--black);
-      min-height: 100vh;
+      --white: #ffffff;
+      --light: #f8fafe;
     }
 
-    /* ── HEADER ── */
+    body {
+      margin: 0;
+      font-family: Poppins, sans-serif;
+      background: var(--white);
+    }
+
     #header {
       background: var(--turquoise);
-      padding: 14px 28px;
+      padding: 16px 28px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      box-shadow: 0 2px 10px rgba(0,193,212,0.25);
-      position: relative;
-      overflow: hidden;
+      align-items: center;
+      color: white;
+      font-weight: 700;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-    #header::before {
-      content: '';
-      position: absolute; right: -30px; top: -40px;
-      width: 180px; height: 180px;
-      border: 2px solid rgba(255,255,255,0.13);
-      transform: rotate(15deg);
-      pointer-events: none;
-    }
-    #header::after {
-      content: '';
-      position: absolute; right: 80px; top: -55px;
-      width: 110px; height: 110px;
-      border: 2px dashed rgba(255,255,255,0.09);
-      transform: rotate(30deg);
-      pointer-events: none;
-    }
-    .header-left { display: flex; align-items: center; gap: 14px; z-index: 1; }
-    .header-wordmark {
-      font-size: 1.6rem; font-weight: 700;
-      color: var(--white); letter-spacing: 2px; line-height: 1;
-    }
-    .header-divider { width: 1.5px; height: 32px; background: rgba(255,255,255,0.3); }
-    .header-title { color: var(--white); font-size: 1rem; font-weight: 600; }
-    .header-sub { color: rgba(255,255,255,0.72); font-size: 0.7rem; margin-top: 1px; }
-    .view-badge {
-      background: rgba(255,255,255,0.2);
-      color: white; border-radius: 20px;
-      padding: 5px 14px; font-size: 0.75rem; font-weight: 700;
-      letter-spacing: 0.5px; z-index: 1;
-    }
-    .view-badge.host-badge { background: rgba(20,58,255,0.35); }
 
-    /* ── APP WRAPPER ── */
-    #app { max-width: 740px; margin: 0 auto; padding: 36px 20px 64px; }
+    #app {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 32px 16px 120px;
+    }
 
-    /* ── SCREENS ── */
     .screen { display: none; }
-    .screen.active { display: block; }
+    .active { display: block; }
 
-    /* ══════════════════════════════════════════════
-       STUDENT VIEW
-    ══════════════════════════════════════════════ */
-    .student-wall {
-      text-align: center;
-      padding: 20px 0 0;
-    }
-    .student-wall-title {
-      font-size: 2.2rem; font-weight: 700;
-      color: var(--black); line-height: 1.2;
-      margin-bottom: 8px;
-    }
-    .student-wall-title span { color: var(--turquoise); }
-    .student-wall-sub {
-      font-size: 0.95rem; color: #666;
-      margin-bottom: 36px; line-height: 1.6;
+    input {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.2rem;
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      margin-bottom: 18px;
     }
 
-    .big-input-wrap {
-      background: var(--light-bg);
-      border: 2px dashed var(--turquoise);
-      border-radius: 24px;
-      padding: 36px 28px 28px;
-      margin-bottom: 28px;
+    .btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      border: none;
+      margin-top: 6px;
     }
-    .big-input-label {
-      font-size: 0.78rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 1.2px;
-      color: var(--turquoise); margin-bottom: 12px;
-    }
-    .big-name-input {
-      width: 100%; padding: 18px 22px;
-      border: 2px solid #ddd; border-radius: 14px;
-      font-family: inherit; font-size: 1.3rem; font-weight: 600;
-      text-align: center; outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      margin-bottom: 14px; color: var(--black);
-      background: white;
-    }
-    .big-name-input:focus {
-      border-color: var(--turquoise);
-      box-shadow: 0 0 0 4px rgba(0,193,212,0.12);
-    }
-    .big-name-input.error {
-      border-color: var(--red);
-      box-shadow: 0 0 0 4px rgba(255,79,79,0.1);
-    }
-    .error-msg {
-      font-size: 0.82rem; color: var(--red);
-      font-weight: 600; min-height: 20px;
-      margin-bottom: 6px; text-align: center;
-    }
-    .signup-btn {
-      width: 100%; padding: 16px;
-      background: var(--turquoise); color: white;
-      border: none; border-radius: 14px;
-      font-family: inherit; font-size: 1.1rem; font-weight: 700;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .signup-btn:hover { background: #00a8ba; transform: translateY(-1px); }
-    .signup-btn:active { transform: translateY(0); }
-    .input-hint { font-size: 0.75rem; color: #aaa; margin-top: 10px; }
+    .btn-primary { background: var(--blue); color: white; }
+    .btn-outline { background: transparent; border: 2px solid var(--blue); color: var(--blue); }
+    .btn-danger { background: var(--red); color: white; }
 
-    /* Student chip list */
-    .signed-up-section { text-align: left; }
-    .signed-up-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 12px;
+    .chip {
+      display: inline-flex;
+      background: var(--blue);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin: 4px;
+      font-size: 0.9rem;
+      font-weight: 600;
     }
-    .signed-up-title { font-size: 0.8rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px; }
-    .count-pill {
-      background: var(--turquoise); color: white;
-      border-radius: 20px; padding: 3px 12px;
-      font-size: 0.8rem; font-weight: 700;
-    }
-    .chips-wrap {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      min-height: 48px;
-      padding: 14px 16px;
-      background: #fafafa;
-      border: 1.5px solid #eee;
-      border-radius: 14px;
-    }
-    .student-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--blue); color: white;
-      border-radius: 20px; padding: 5px 14px 5px 14px;
-      font-size: 0.82rem; font-weight: 600;
-      animation: popIn 0.22s cubic-bezier(.34,1.56,.64,1);
-    }
-    @keyframes popIn {
-      from { transform: scale(0.6); opacity: 0; }
-      to   { transform: scale(1);   opacity: 1; }
-    }
-    .empty-chips { color: #bbb; font-size: 0.83rem; width: 100%; text-align: center; padding: 4px 0; }
-
-    /* Waiting state */
-    .waiting-banner {
-      background: var(--light-bg);
-      border: 1.5px solid var(--turquoise);
-      border-radius: 14px;
-      padding: 18px 22px;
-      text-align: center;
-      margin-top: 28px;
-      font-size: 0.88rem;
-      color: #555;
-    }
-    .waiting-banner strong { color: var(--blue); }
-
-    /* ── RESULT SCREEN (student) ── */
-    .result-announce {
-      text-align: center;
-      padding: 12px 0 32px;
-    }
-    .result-announce h2 {
-      font-size: 2rem; font-weight: 700; color: var(--blue);
-      margin-bottom: 6px;
-    }
-    .result-announce p { color: #666; font-size: 0.92rem; }
 
     .groups-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
       gap: 16px;
-      margin-bottom: 32px;
+      margin-top: 22px;
     }
+
     .group-card {
-      border-radius: 16px; padding: 22px 18px;
-      position: relative; overflow: hidden;
-      animation: cardIn 0.35s ease both;
-    }
-    @keyframes cardIn {
-      from { transform: translateY(16px) scale(0.96); opacity: 0; }
-      to   { transform: none; opacity: 1; }
-    }
-    .group-card::after {
-      content: ''; position: absolute;
-      bottom: -22px; right: -22px;
-      width: 90px; height: 90px;
-      border-radius: 50%; background: rgba(255,255,255,0.08);
-    }
-    .gc-num {
-      font-size: 2.4rem; font-weight: 700;
-      opacity: 0.13; position: absolute;
-      top: 6px; right: 12px; line-height: 1;
-    }
-    .gc-label {
-      font-size: 0.72rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 1.2px;
-      opacity: 0.72; margin-bottom: 10px;
-    }
-    .gc-members { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-    .gc-members li {
-      font-size: 0.88rem; font-weight: 600;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .gc-members li::before {
-      content: ''; display: inline-block;
-      width: 6px; height: 6px; border-radius: 50%;
-      background: rgba(255,255,255,0.65); flex-shrink: 0;
-    }
-    .gc-0 { background: var(--blue); color: white; }
-    .gc-1 { background: var(--turquoise); color: white; }
-    .gc-2 { background: var(--violet); color: white; }
-    .gc-3 { background: #FF7E15; color: white; }
-    .gc-4 { background: #FF4F4F; color: white; }
-    .gc-5 { background: #1a7a4a; color: white; }
-    .gc-6 { background: #1a1a2e; color: white; }
-    .gc-7 { background: #7E5BEF; color: white; }
-    .gc-8 { background: #2C7873; color: white; }
-
-    /* ══════════════════════════════════════════════
-       HOST VIEW
-    ══════════════════════════════════════════════ */
-    .host-section-title {
-      font-size: 0.72rem; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 1.2px;
-      color: var(--turquoise); margin-bottom: 14px;
-    }
-    .host-card {
-      background: var(--card-bg);
-      border: 1.5px solid #e8e8e8;
-      border-radius: 16px;
-      padding: 22px 22px;
-      margin-bottom: 20px;
-      position: relative;
-      overflow: hidden;
-    }
-    .host-card::before {
-      content: ''; position: absolute;
-      top: 0; left: 0; right: 0; height: 3px;
       background: var(--blue);
+      color: white;
+      padding: 20px;
+      border-radius: 16px;
     }
-    .host-card-title {
-      font-size: 0.95rem; font-weight: 700;
-      color: var(--blue); margin-bottom: 4px;
-    }
-    .host-card-sub { font-size: 0.8rem; color: #888; margin-bottom: 18px; }
-
-    /* Toggle */
-    .toggle-row {
-      display: flex; background: #ebebeb;
-      border-radius: 10px; padding: 3px; gap: 3px; margin-bottom: 18px;
-    }
-    .toggle-btn {
-      flex: 1; padding: 9px 10px;
-      border: none; border-radius: 8px;
-      font-family: inherit; font-size: 0.85rem; font-weight: 600;
-      cursor: pointer; background: transparent; color: #888;
-      transition: all 0.18s;
-    }
-    .toggle-btn.active { background: var(--blue); color: white; }
-
-    /* Num control */
-    .num-row { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
-    .num-row-label { font-size: 0.88rem; font-weight: 600; flex: 1; }
-    .num-ctrl {
-      display: flex; align-items: center;
-      border: 1.5px solid var(--turquoise); border-radius: 10px; overflow: hidden;
-    }
-    .num-btn {
-      width: 38px; height: 38px; border: none;
-      background: var(--turquoise); color: white;
-      font-size: 1.2rem; font-weight: 700; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.15s;
-    }
-    .num-btn:hover { background: #00a8ba; }
-    .num-val {
-      width: 48px; text-align: center;
-      font-size: 1.05rem; font-weight: 700;
-      background: white; border: none;
-      color: var(--blue); font-family: inherit; outline: none;
-    }
-    .num-val::-webkit-inner-spin-button { display: none; }
-
-    /* Remainder */
-    .rem-opts { display: flex; gap: 8px; flex-wrap: wrap; }
-    .rem-opt {
-      padding: 8px 14px; border-radius: 9px;
-      border: 1.5px solid var(--gray);
-      font-family: inherit; font-size: 0.8rem; font-weight: 600;
-      cursor: pointer; background: white; color: #666;
-      transition: all 0.18s;
-    }
-    .rem-opt.active { border-color: var(--blue); background: var(--blue); color: white; }
-
-    /* Student roster in host */
-    .roster {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      min-height: 52px; padding: 14px 14px;
-      background: white; border: 1.5px solid #eee;
-      border-radius: 12px; margin-top: 8px;
-    }
-    .roster-chip {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: var(--blue); color: white;
-      border-radius: 20px; padding: 4px 10px 4px 12px;
-      font-size: 0.78rem; font-weight: 600;
-      animation: popIn 0.2s ease;
-    }
-    .chip-x {
-      background: rgba(255,255,255,0.2); border: none; color: white;
-      border-radius: 50%; width: 16px; height: 16px;
-      font-size: 0.6rem; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 900;
-    }
-    .chip-x:hover { background: rgba(255,255,255,0.38); }
-
-    /* Info box */
-    .info-box {
-      background: var(--light-bg);
-      border-left: 4px solid var(--turquoise);
-      border-radius: 0 10px 10px 0;
-      padding: 11px 16px; font-size: 0.82rem;
-      color: #444; margin: 14px 0; line-height: 1.7;
-    }
-    .info-box strong { color: var(--blue); }
-
-    /* Host result section */
-    .host-result-header {
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
-    }
-    .host-result-header h3 {
-      font-size: 1.1rem; font-weight: 700; color: var(--blue);
-    }
-    .host-result-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-    /* Shuffle anim */
-    .shuffle-anim { text-align: center; padding: 40px 0; }
-    .shuffle-spinner {
-      width: 56px; height: 56px;
-      border: 4px solid var(--gray);
-      border-top-color: var(--turquoise);
-      border-radius: 50%;
-      animation: spin 0.75s linear infinite;
-      margin: 0 auto 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── BUTTONS ── */
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      gap: 7px; padding: 11px 22px;
-      border-radius: 11px; border: none;
-      font-family: inherit; font-size: 0.88rem; font-weight: 700;
-      cursor: pointer; transition: all 0.18s;
-    }
-    .btn-primary { background: var(--blue); color: white; }
-    .btn-primary:hover { background: #0f2fd4; transform: translateY(-1px); }
-    .btn-turquoise { background: var(--turquoise); color: white; }
-    .btn-turquoise:hover { background: #00a8ba; transform: translateY(-1px); }
-    .btn-outline { background: transparent; color: var(--blue); border: 1.5px solid var(--blue); }
-    .btn-outline:hover { background: var(--blue); color: white; }
-    .btn-ghost { background: #efefef; color: #555; }
-    .btn-ghost:hover { background: #e2e2e2; }
-    .btn-danger { background: var(--red); color: white; }
-    .btn-danger:hover { background: #d93d3d; }
-    .btn-full { width: 100%; }
-    .btn-big { padding: 15px 28px; font-size: 1rem; }
-    .btn-sm { padding: 7px 13px; font-size: 0.76rem; }
-    .btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none !important; }
-
-    /* ── UTILITY ── */
-    .mt-8 { margin-top: 8px; }
-    .mt-16 { margin-top: 16px; }
-    .mt-24 { margin-top: 24px; }
-    .flex { display: flex; }
-    .gap-8 { gap: 8px; }
-    .gap-12 { gap: 12px; }
-    .wrap { flex-wrap: wrap; }
-    .align-center { align-items: center; }
-    .justify-between { justify-content: space-between; }
-    .divider { border: none; border-top: 1.5px solid #eee; margin: 18px 0; }
-    .text-muted { color: #999; font-size: 0.8rem; }
-
-    /* ── PRINT ── */
-    @media print {
-      #header, .host-result-actions, .host-card:not(#result-host-card) { display: none !important; }
-      body { background: white; }
-      #app { padding: 0; max-width: 100%; }
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 520px) {
-      .groups-grid { grid-template-columns: 1fr 1fr; }
-      .student-wall-title { font-size: 1.6rem; }
-      #app { padding: 20px 14px 50px; }
-      .header-sub { display: none; }
-      .big-input-wrap { padding: 24px 16px 20px; }
+    .group-card h3 {
+      margin-top: 0;
+      font-size: 1.2rem;
     }
   </style>
 </head>
+
 <body>
-
-<!-- HEADER -->
-<div id="header">
-  <div class="header-left">
-    <div class="header-wordmark">ODCE</div>
-    <div class="header-divider"></div>
-    <div>
-      <div class="header-title">Group Randomizer</div>
-      <div class="header-sub">TU Hamburg · Institut für Organisationsdesign und Collaborative Engineering</div>
-    </div>
-  </div>
-  <div class="view-badge" id="view-badge">Student View</div>
-</div>
-
-<div id="app">
-
-  <!-- ══════════════════════════════════════
-       STUDENT SCREENS
-  ══════════════════════════════════════ -->
-
-  <!-- S1: Sign-up wall -->
-  <div class="screen active" id="screen-student-signup">
-    <div class="student-wall">
-      <h1 class="student-wall-title">Sign up for <span>your group.</span></h1>
-      <p class="student-wall-sub">Enter your name below — the host will randomize groups when everyone is ready.</p>
-
-      <div class="big-input-wrap">
-        <div class="big-input-label">✍️ Your name</div>
-        <input
-          class="big-name-input"
-          type="text" id="s-name-input"
-          placeholder="Type your name…"
-          onkeydown="if(event.key==='Enter')studentSignUp()"
-          oninput="clearErr()"
-          autocomplete="off" autocorrect="off" spellcheck="false" maxlength="40"
-        >
-        <div class="error-msg" id="s-error"></div>
-        <button class="signup-btn" onclick="studentSignUp()">Sign Up →</button>
-        <div class="input-hint">Press Enter or tap Sign Up</div>
-      </div>
-
-      <div class="signed-up-section">
-        <div class="signed-up-header">
-          <span class="signed-up-title">Signed up</span>
-          <span class="count-pill" id="s-count">0</span>
-        </div>
-        <div class="chips-wrap" id="s-chips">
-          <span class="empty-chips">No one yet — be the first!</span>
-        </div>
-      </div>
-
-      <div class="waiting-banner">
-        Waiting for the host to start randomization… 🎲
-      </div>
-    </div>
+  <!-- HEADER -->
+  <div id="header">
+    <div>ODCE Group Mixer</div>
+    <div id="roleBadge"></div>
   </div>
 
-  <!-- S2: Result reveal -->
-  <div class="screen" id="screen-student-result">
-    <div class="result-announce">
-      <h2>Groups are ready! 🎉</h2>
-      <p id="s-result-summary"></p>
+  <!-- MAIN APP -->
+  <div id="app">
+
+    <!-- STUDENT SIGNUP -->
+    <div id="screen-student" class="screen">
+      <h2>Join the session</h2>
+      <p>Enter your name to appear in the list.</p>
+
+      <input id="studentNameInput" placeholder="Your name…"/>
+
+      <button onclick="studentSignup()" class="btn btn-primary">Sign Up</button>
+
+      <h3 style="margin-top:36px;">Signed Up</h3>
+      <div id="studentList"></div>
     </div>
-    <div class="groups-grid" id="s-groups-grid"></div>
+
+    <!-- STUDENT RESULT -->
+    <div id="screen-student-result" class="screen">
+      <h2>Your Group</h2>
+      <div id="myGroupBox" style="margin-bottom: 24px;"></div>
+
+      <h3>All Groups</h3>
+      <div id="studentGroupsGrid" class="groups-grid"></div>
+    </div>
+
+    <!-- HOST PANEL -->
+    <div id="screen-host" class="screen">
+      <h2>Host Panel</h2>
+
+      <label>Number of groups</label>
+      <input id="hostNumGroups" type="number" min="1" value="4" style="width:140px;"/>
+
+      <button class="btn btn-primary" onclick="hostRandomize()">Randomize Groups</button>
+      <button class="btn btn-outline" onclick="hostReset()">Reset Session</button>
+
+      <h3 style="margin-top:36px;">Students</h3>
+      <div id="hostStudentList"></div>
+
+      <h3 style="margin-top:28px;">Groups</h3>
+      <div id="hostGroupsGrid" class="groups-grid"></div>
+    </div>
+
   </div>
-
-
-  <!-- ══════════════════════════════════════
-       HOST SCREENS
-  ══════════════════════════════════════ -->
-
-  <!-- H1: Setup + Roster + Trigger -->
-  <div class="screen" id="screen-host-main">
-
-    <!-- Settings -->
-    <div class="host-card">
-      <div class="host-card-title">Group Settings</div>
-      <div class="host-card-sub">Define how students are split into groups.</div>
-
-      <div class="toggle-row">
-        <button class="toggle-btn active" id="h-mode-numgroups" onclick="setMode('numGroups')"># of Groups</button>
-        <button class="toggle-btn" id="h-mode-pergroup" onclick="setMode('perGroup')">Students per Group</button>
-      </div>
-
-      <div class="num-row">
-        <span class="num-row-label" id="h-num-label">Number of groups</span>
-        <div class="num-ctrl">
-          <button class="num-btn" onclick="changeNum(-1)">−</button>
-          <input class="num-val" type="number" id="h-num-val" value="4" min="1" max="99" oninput="syncNum();updateHostPreview()">
-          <button class="num-btn" onclick="changeNum(1)">+</button>
-        </div>
-      </div>
-
-      <div style="margin-bottom:6px;font-size:0.85rem;font-weight:600;color:#444;">Remainder handling</div>
-      <div class="rem-opts">
-        <button class="rem-opt active" id="rem-smaller" onclick="setRem('smaller')">↙ Smaller group</button>
-        <button class="rem-opt" id="rem-bigger"  onclick="setRem('bigger')">↗ Bigger group</button>
-        <button class="rem-opt" id="rem-distribute" onclick="setRem('distribute')">⚖ Distribute</button>
-      </div>
-    </div>
-
-    <!-- Roster -->
-    <div class="host-card">
-      <div class="flex align-center justify-between" style="margin-bottom:4px;">
-        <div class="host-card-title">Students Signed Up</div>
-        <div class="flex gap-8">
-          <span class="count-pill" id="h-count">0</span>
-          <button class="btn btn-ghost btn-sm" onclick="hostClearAll()">🗑 Clear</button>
-        </div>
-      </div>
-      <div class="host-card-sub">Students join from the student view. You can also remove names here.</div>
-      <div class="info-box" id="h-preview">Add students to see group preview.</div>
-      <div class="roster" id="h-roster">
-        <span class="empty-chips">No students yet.</span>
-      </div>
-    </div>
-
-    <!-- Randomize -->
-    <button class="btn btn-primary btn-full btn-big" id="h-randomize-btn" onclick="hostRandomize()" disabled>
-      🎲 Randomize Groups
-    </button>
-    <p class="text-muted mt-8" style="text-align:center">Results will appear in both this panel and the student screen.</p>
-  </div>
-
-  <!-- H2: Result panel -->
-  <div class="screen" id="screen-host-result">
-    <div class="host-card" id="result-host-card">
-      <div class="host-result-header">
-        <h3 id="h-result-title">Groups</h3>
-        <div class="host-result-actions">
-          <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨 Print</button>
-          <button class="btn btn-outline btn-sm" onclick="hostReshuffle()">🔀 Re-shuffle</button>
-          <button class="btn btn-danger btn-sm" onclick="hostReset()">↺ Reset</button>
-        </div>
-      </div>
-
-      <div class="shuffle-anim" id="h-shuffle-anim">
-        <div class="shuffle-spinner"></div>
-        <p style="font-weight:600;color:var(--blue);">Randomizing…</p>
-      </div>
-
-      <div id="h-groups-grid-wrap" style="display:none">
-        <div class="groups-grid" id="h-groups-grid"></div>
-        <p class="text-muted" style="text-align:center">Students can see these groups on their screen.</p>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /app -->
 
 <script>
-// ══════════════════════════════════════════════
-// SHARED STATE  (persisted in localStorage)
-// ══════════════════════════════════════════════
-const STORE_KEY = 'odce_grouprandomizer';
+/* ======================================================
+   CONFIG — INSERT YOUR SUPABASE KEYS HERE
+====================================================== */
+const SUPABASE_URL = "https://YOURPROJECTID.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function loadStore() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; }
-}
-function saveStore(data) {
-  localStorage.setItem(STORE_KEY, JSON.stringify(data));
-}
-function getStore() {
-  return loadStore();
-}
-function patchStore(patch) {
-  const s = loadStore();
-  Object.assign(s, patch);
-  saveStore(s);
-}
+/* GLOBAL SESSION (you requested global session) */
+const SESSION_ID = "odce-global-session";
 
-// Initial store structure
-function initStore() {
-  const s = loadStore();
-  if (!s.students) s.students = [];
-  if (!s.mode) s.mode = 'numGroups';
-  if (!s.num) s.num = 4;
-  if (!s.remainder) s.remainder = 'smaller';
-  if (!s.phase) s.phase = 'signup'; // 'signup' | 'result'
-  if (!s.groups) s.groups = [];
-  saveStore(s);
+/* Detect role */
+const isHost = new URLSearchParams(location.search).get("host") === "true";
+document.getElementById("roleBadge").textContent = isHost ? "Host" : "Student";
+show(isHost ? "screen-host" : "screen-student");
+
+
+/* ======================================================
+   NAVIGATION
+====================================================== */
+function show(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
 }
 
-// ── ROLE DETECTION ──
-const isHost = new URLSearchParams(window.location.search).get('host') === 'true';
 
-// ══════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════
-function init() {
-  initStore();
-  if (isHost) {
-    document.getElementById('view-badge').textContent = '🎛 Host Panel';
-    document.getElementById('view-badge').classList.add('host-badge');
-    renderHostMain();
-    const s = getStore();
-    if (s.phase === 'result' && s.groups.length) {
-      showHostResult(false);
-    }
-  } else {
-    document.getElementById('view-badge').textContent = 'Student View';
-    renderStudentSignup();
-    const s = getStore();
-    if (s.phase === 'result' && s.groups.length) {
-      showStudentResult();
-    }
-    // Poll for updates every 1.5s
-    setInterval(pollStudentView, 1500);
-  }
-}
+/* ======================================================
+   STUDENT SIGNUP
+====================================================== */
+async function studentSignup() {
+  const name = document.getElementById("studentNameInput").value.trim();
+  if (!name) return;
 
-// ══════════════════════════════════════════════
-// STUDENT LOGIC
-// ══════════════════════════════════════════════
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function clearErr() {
-  document.getElementById('s-name-input').classList.remove('error');
-  document.getElementById('s-error').textContent = '';
-}
-
-function studentSignUp() {
-  const inp = document.getElementById('s-name-input');
-  const name = inp.value.trim();
-  if (!name) {
-    inp.classList.add('error');
-    document.getElementById('s-error').textContent = 'Please enter your name.';
-    return;
-  }
-  const s = getStore();
-  if (s.students.some(n => n.toLowerCase() === name.toLowerCase())) {
-    inp.classList.add('error');
-    document.getElementById('s-error').textContent = `"${name}" is already signed up!`;
-    return;
-  }
-  s.students.push(name);
-  saveStore(s);
-  inp.value = '';
-  clearErr();
-  renderStudentSignup();
-  inp.focus();
-}
-
-function renderStudentSignup() {
-  const s = getStore();
-  const chips = document.getElementById('s-chips');
-  document.getElementById('s-count').textContent = s.students.length;
-  chips.innerHTML = '';
-  if (s.students.length === 0) {
-    chips.innerHTML = '<span class="empty-chips">No one yet — be the first!</span>';
-    return;
-  }
-  s.students.forEach(name => {
-    const c = document.createElement('div');
-    c.className = 'student-chip';
-    c.textContent = name;
-    chips.appendChild(c);
+  await supabase.from("students").insert({
+    session: SESSION_ID,
+    name
   });
+
+  document.getElementById("studentNameInput").value = "";
 }
 
-function showStudentResult() {
-  showScreen('screen-student-result');
-  const s = getStore();
-  document.getElementById('s-result-summary').textContent =
-    `${s.students.length} students · ${s.groups.length} groups`;
-  renderGroupGrid('s-groups-grid', s.groups);
+
+/* ======================================================
+   REALTIME FEEDS
+====================================================== */
+async function subscribeRealtime() {
+  supabase.channel("students")
+    .on("postgres_changes", { event: "*", table: "students" }, refreshAll)
+    .subscribe();
+
+  supabase.channel("groups")
+    .on("postgres_changes", { event: "*", table: "groups" }, refreshAll)
+    .subscribe();
+
+  refreshAll();
+}
+subscribeRealtime();
+
+
+/* ======================================================
+   UI REFRESH
+====================================================== */
+async function refreshAll() {
+  refreshStudentList();
+  refreshHostStudentList();
+  refreshGroups();
 }
 
-function pollStudentView() {
-  const s = getStore();
-  // If result just appeared, switch screen
-  const resultVisible = document.getElementById('screen-student-result').classList.contains('active');
-  if (s.phase === 'result' && s.groups.length && !resultVisible) {
-    showStudentResult();
-  }
-  // If reset happened, go back to signup
-  if (s.phase === 'signup' && resultVisible) {
-    showScreen('screen-student-signup');
-    renderStudentSignup();
-  }
-  // Always refresh chip list
-  if (s.phase === 'signup') renderStudentSignup();
+async function refreshStudentList() {
+  const { data } = await supabase
+    .from("students")
+    .select("*")
+    .eq("session", SESSION_ID)
+    .order("created_at");
+
+  const area = document.getElementById("studentList");
+  if (!area) return;
+
+  area.innerHTML = data.map(s => `<div class="chip">${s.name}</div>`).join("");
 }
 
-// ══════════════════════════════════════════════
-// HOST LOGIC
-// ══════════════════════════════════════════════
-let hostMode = 'numGroups';
-let hostRemainder = 'smaller';
+async function refreshHostStudentList() {
+  if (!isHost) return;
 
-function renderHostMain() {
-  showScreen('screen-host-main');
-  const s = getStore();
-  // Sync UI from store
-  hostMode = s.mode || 'numGroups';
-  hostRemainder = s.remainder || 'smaller';
-  document.getElementById('h-num-val').value = s.num || 4;
-  setMode(hostMode, true);
-  setRem(hostRemainder, true);
-  renderHostRoster();
-  updateHostPreview();
+  const { data } = await supabase
+    .from("students")
+    .select("*")
+    .eq("session", SESSION_ID)
+    .order("created_at");
+
+  const area = document.getElementById("hostStudentList");
+  area.innerHTML = data.map(s => `<div class="chip">${s.name}</div>`).join("");
 }
 
-function setMode(m, silent) {
-  hostMode = m;
-  document.getElementById('h-mode-numgroups').classList.toggle('active', m === 'numGroups');
-  document.getElementById('h-mode-pergroup').classList.toggle('active', m === 'perGroup');
-  document.getElementById('h-num-label').textContent =
-    m === 'numGroups' ? 'Number of groups' : 'Students per group';
-  if (!silent) { patchStore({mode: m}); updateHostPreview(); }
-}
 
-function setRem(r, silent) {
-  hostRemainder = r;
-  ['smaller','bigger','distribute'].forEach(x =>
-    document.getElementById('rem-' + x).classList.toggle('active', x === r));
-  if (!silent) { patchStore({remainder: r}); updateHostPreview(); }
-}
-
-function changeNum(d) {
-  const el = document.getElementById('h-num-val');
-  let v = (parseInt(el.value) || 1) + d;
-  if (v < 1) v = 1;
-  el.value = v;
-  patchStore({num: v});
-  updateHostPreview();
-}
-function syncNum() {
-  const v = parseInt(document.getElementById('h-num-val').value) || 1;
-  patchStore({num: v});
-}
-
-function renderHostRoster() {
-  const s = getStore();
-  const roster = document.getElementById('h-roster');
-  document.getElementById('h-count').textContent = s.students.length;
-  document.getElementById('h-randomize-btn').disabled = s.students.length < 2;
-  roster.innerHTML = '';
-  if (s.students.length === 0) {
-    roster.innerHTML = '<span class="empty-chips">No students yet.</span>';
-    return;
-  }
-  s.students.forEach((name, i) => {
-    const c = document.createElement('div');
-    c.className = 'roster-chip';
-    c.innerHTML = `${esc(name)}<button class="chip-x" onclick="hostRemoveStudent(${i})">✕</button>`;
-    roster.appendChild(c);
-  });
-}
-
-function hostRemoveStudent(idx) {
-  const s = getStore();
-  s.students.splice(idx, 1);
-  saveStore(s);
-  renderHostRoster();
-  updateHostPreview();
-}
-
-function hostClearAll() {
-  if (!confirm('Remove all students?')) return;
-  patchStore({students: []});
-  renderHostRoster();
-  updateHostPreview();
-}
-
-function computeSizes(total) {
-  if (total === 0) return [];
-  const s = getStore();
-  const num = s.num || 4;
-  const mode = s.mode || 'numGroups';
-  const rem = s.remainder || 'smaller';
-  let groupCount, baseSize;
-  if (mode === 'numGroups') {
-    groupCount = Math.max(1, Math.min(num, total));
-    baseSize = Math.floor(total / groupCount);
-  } else {
-    baseSize = Math.max(1, num);
-    groupCount = Math.max(1, Math.floor(total / baseSize));
-  }
-  const remainder = total - baseSize * groupCount;
-  let sizes = Array(groupCount).fill(baseSize);
-  if (remainder > 0) {
-    if (rem === 'bigger') {
-      sizes[0] += remainder;
-    } else if (rem === 'smaller') {
-      if (mode === 'numGroups') sizes[sizes.length - 1] = remainder;
-      else sizes.push(remainder);
-    } else {
-      for (let i = 0; i < remainder; i++) sizes[i % groupCount]++;
-    }
-  }
-  return sizes;
-}
-
-function updateHostPreview() {
-  const s = getStore();
-  const n = s.students.length;
-  renderHostRoster();
-  if (n < 2) {
-    document.getElementById('h-preview').innerHTML = 'Add at least 2 students to enable randomization.';
-    return;
-  }
-  const sizes = computeSizes(n);
-  const gc = sizes.length;
-  const unique = [...new Set(sizes)].sort((a,b)=>a-b).join(' or ');
-  const remNote = new Set(sizes).size > 1
-    ? (hostRemainder === 'bigger' ? 'One group will be larger.'
-     : hostRemainder === 'smaller' ? 'One group will be smaller.'
-     : 'Sizes distributed as evenly as possible.')
-    : 'All groups are equal size.';
-  document.getElementById('h-preview').innerHTML =
-    `<strong>${n} students</strong> → <strong>${gc} group${gc>1?'s':''}</strong> of <strong>${unique}</strong>. ${remNote}`;
-}
-
+/* ======================================================
+   GROUP RANDOMIZATION
+====================================================== */
 function shuffle(arr) {
   const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+  for (let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
   }
   return a;
 }
 
-function buildGroups() {
-  const s = getStore();
-  const shuffled = shuffle(s.students);
-  const sizes = computeSizes(shuffled.length);
+async function hostRandomize() {
+  const n = parseInt(document.getElementById("hostNumGroups").value);
+
+  const { data: students } = await supabase
+    .from("students")
+    .select("*")
+    .eq("session", SESSION_ID);
+
+  if (!students.length) return;
+
+  const names = shuffle(students.map(s => s.name));
+  const size = Math.ceil(names.length / n);
+
   const groups = [];
   let idx = 0;
-  sizes.forEach((size, i) => {
-    groups.push({ number: i+1, members: shuffled.slice(idx, idx+size) });
+
+  for (let g = 1; g <= n; g++) {
+    groups.push({
+      session: SESSION_ID,
+      group_number: g,
+      members: names.slice(idx, idx + size)
+    });
     idx += size;
-  });
-  return groups;
+  }
+
+  await supabase.from("groups").delete().eq("session", SESSION_ID);
+  for (const g of groups) await supabase.from("groups").insert(g);
 }
 
-function hostRandomize() {
-  const s = getStore();
-  if (s.students.length < 2) return;
-  showHostResult(true);
-}
 
-function showHostResult(animate) {
-  showScreen('screen-host-result');
-  document.getElementById('h-shuffle-anim').style.display = animate ? 'block' : 'none';
-  document.getElementById('h-groups-grid-wrap').style.display = animate ? 'none' : 'block';
-  if (animate) {
-    const groups = buildGroups();
-    patchStore({ phase: 'result', groups });
-    setTimeout(() => {
-      document.getElementById('h-shuffle-anim').style.display = 'none';
-      document.getElementById('h-groups-grid-wrap').style.display = 'block';
-      renderHostResultGrid();
-    }, 900);
-  } else {
-    renderHostResultGrid();
+/* ======================================================
+   GROUP DISPLAY
+====================================================== */
+async function refreshGroups() {
+  const { data: groups } = await supabase
+    .from("groups")
+    .select("*")
+    .eq("session", SESSION_ID)
+    .order("group_number");
+
+  // Host grid
+  if (isHost) {
+    const hostGrid = document.getElementById("hostGroupsGrid");
+    hostGrid.innerHTML = groups.map(g => `
+      <div class="group-card">
+        <h3>Group ${g.group_number}</h3>
+        ${g.members.map(m => `<div>${m}</div>`).join("")}
+      </div>
+    `).join("");
+  }
+
+  // Student display
+  const stGrid = document.getElementById("studentGroupsGrid");
+  if (stGrid) {
+    stGrid.innerHTML = groups.map(g => `
+      <div class="group-card">
+        <h3>Group ${g.group_number}</h3>
+        ${g.members.map(m => `<div>${m}</div>`).join("")}
+      </div>
+    `).join("");
+  }
+
+  // Detect student's own group
+  if (!isHost) {
+    const myName = document.getElementById("studentNameInput")?.value.trim() || null;
+    let myGroup = null;
+    groups.forEach(g => {
+      if (g.members.includes(myName)) myGroup = g.group_number;
+    });
+
+    if (myGroup) {
+      show("screen-student-result");
+      document.getElementById("myGroupBox").innerHTML = `
+        <div class="group-card" style="background:var(--turquoise)">
+          <h3>You are in Group ${myGroup}</h3>
+        </div>`;
+    }
   }
 }
 
-function renderHostResultGrid() {
-  const s = getStore();
-  const gc = s.groups.length;
-  document.getElementById('h-result-title').textContent =
-    `${s.students.length} students · ${gc} group${gc>1?'s':''}`;
-  renderGroupGrid('h-groups-grid', s.groups);
-}
 
-function hostReshuffle() {
-  document.getElementById('h-shuffle-anim').style.display = 'block';
-  document.getElementById('h-groups-grid-wrap').style.display = 'none';
-  const groups = buildGroups();
-  patchStore({ groups });
-  setTimeout(() => {
-    document.getElementById('h-shuffle-anim').style.display = 'none';
-    document.getElementById('h-groups-grid-wrap').style.display = 'block';
-    renderHostResultGrid();
-  }, 700);
-}
+/* ======================================================
+   HOST RESET
+====================================================== */
+async function hostReset() {
+  if (!confirm("Reset all students and groups?")) return;
 
-function hostReset() {
-  if (!confirm('Reset everything? This will clear students and results.')) return;
-  patchStore({ students: [], groups: [], phase: 'signup' });
-  renderHostMain();
-}
+  await supabase.from("students").delete().eq("session", SESSION_ID);
+  await supabase.from("groups").delete().eq("session", SESSION_ID);
 
-// ── SHARED RENDER ──
-function renderGroupGrid(gridId, groups) {
-  const grid = document.getElementById(gridId);
-  grid.innerHTML = '';
-  groups.forEach((g, i) => {
-    const card = document.createElement('div');
-    card.className = `group-card gc-${i % 9}`;
-    card.style.animationDelay = `${i * 0.06}s`;
-    card.innerHTML = `
-      <div class="gc-num">${g.number}</div>
-      <div class="gc-label">Group ${g.number}</div>
-      <ul class="gc-members">${g.members.map(m=>`<li>${esc(m)}</li>`).join('')}</ul>`;
-    grid.appendChild(card);
-  });
-}
-
-// ── UTILS ──
-function esc(s) {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ── BOOT ──
-init();
-
-// Host polls roster every 2s to catch student sign-ups
-if (isHost) {
-  setInterval(() => {
-    const screen = document.getElementById('screen-host-main');
-    if (screen.classList.contains('active')) {
-      updateHostPreview();
-    }
-  }, 2000);
+  refreshAll();
 }
 </script>
 </body>
