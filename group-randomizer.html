@@ -5,123 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ODCE Group Mixer</title>
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    :root {
-      --turquoise: #00C1D4;
-      --blue: #143AFF;
-      --violet: #7200FE;
-      --mint: #5AFFC5;
-      --red: #FF4F4F;
-      --white: #ffffff;
-      --light: #f8fafe;
-      --text: #0b1020;
-      --muted: rgba(11,16,32,0.72);
+    :root{
+      --turquoise:#00C1D4; --blue:#143AFF; --violet:#7200FE; --mint:#5AFFC5; --red:#FF4F4F;
+      --white:#fff; --light:#f8fafe; --text:#0b1020; --muted:rgba(11,16,32,.72);
+      --card:#ffffff; --border:rgba(0,0,0,.08);
     }
+    body{margin:0;font-family:Poppins,system-ui,sans-serif;background:var(--white);color:var(--text)}
+    #header{background:var(--turquoise);padding:16px 28px;display:flex;justify-content:space-between;align-items:center;color:#fff;font-weight:700;font-size:1.2rem;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+    #app{max-width:740px;margin:0 auto;padding:32px 16px 120px}
+    .screen{display:none}.active{display:block}
 
-    body {
-      margin: 0;
-      font-family: Poppins, sans-serif;
-      background: var(--white);
-      color: var(--text);
+    input, select{
+      width:100%;padding:14px;font-size:1.05rem;border:2px solid #ccc;border-radius:12px;margin-bottom:18px;box-sizing:border-box;
+      background:#fff;
     }
+    label{display:block;font-weight:600;margin:8px 0 8px}
 
-    #header {
-      background: var(--turquoise);
-      padding: 16px 28px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: white;
-      font-weight: 700;
-      font-size: 1.2rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    .btn{width:100%;padding:14px;font-size:1rem;font-weight:700;border-radius:12px;cursor:pointer;border:none;margin-top:6px}
+    .btn-primary{background:var(--blue);color:#fff}
+    .btn-outline{background:transparent;border:2px solid var(--blue);color:var(--blue)}
+    .btn-danger{background:var(--red);color:#fff}
+
+    .row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+    .row > *{flex:1}
+    .row .fixed{flex:0 0 auto}
+
+    .chip{display:inline-flex;background:var(--blue);color:#fff;padding:6px 14px;border-radius:20px;margin:4px;font-size:.9rem;font-weight:600}
+    .muted{color:var(--muted)}
+    .notice{margin:12px 0 18px;padding:10px 12px;border-radius:12px;background:var(--light);border:1px solid var(--border);font-size:.95rem}
+    .notice.ok{border-color:rgba(90,255,197,.55)} .notice.err{border-color:rgba(255,79,79,.6)}
+
+    .panel{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      background:var(--card);
+      margin: 10px 0 18px;
     }
+    .panel h3{margin:0 0 10px;font-size:1.05rem}
 
-    #app {
-      max-width: 740px;
-      margin: 0 auto;
-      padding: 32px 16px 120px;
+    .groups-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-top:22px}
+    .group-card{background:var(--blue);color:#fff;padding:20px;border-radius:16px}
+    .group-card h3{margin-top:0;font-size:1.2rem}
+    .leader-badge{
+      display:inline-block;
+      margin-top:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:700;
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.25);
+      font-size:.9rem;
     }
-
-    .screen { display: none; }
-    .active { display: block; }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      font-size: 1.1rem;
-      border: 2px solid #ccc;
-      border-radius: 12px;
-      margin-bottom: 18px;
-      box-sizing: border-box;
-    }
-
-    label { display:block; font-weight:600; margin: 8px 0 8px; }
-
-    .btn {
-      width: 100%;
-      padding: 14px;
-      font-size: 1rem;
-      font-weight: 700;
-      border-radius: 12px;
-      cursor: pointer;
-      border: none;
-      margin-top: 6px;
-    }
-    .btn-primary { background: var(--blue); color: white; }
-    .btn-outline { background: transparent; border: 2px solid var(--blue); color: var(--blue); }
-    .btn-danger { background: var(--red); color: white; }
-
-    .row { display:flex; gap: 12px; align-items:center; flex-wrap: wrap; }
-    .row > * { flex: 1; }
-    .row .fixed { flex: 0 0 auto; }
-
-    .chip {
-      display: inline-flex;
-      background: var(--blue);
-      color: white;
-      padding: 6px 14px;
-      border-radius: 20px;
-      margin: 4px;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-
-    .muted { color: var(--muted); }
-
-    .notice {
-      margin: 12px 0 18px;
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: var(--light);
-      border: 1px solid rgba(0,0,0,0.08);
-      font-size: 0.95rem;
-    }
-    .notice.ok { border-color: rgba(90,255,197,0.55); }
-    .notice.err { border-color: rgba(255,79,79,0.6); }
-
-    .groups-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 16px;
-      margin-top: 22px;
-    }
-
-    .group-card {
-      background: var(--blue);
-      color: white;
-      padding: 20px;
-      border-radius: 16px;
-    }
-    .group-card h3 {
-      margin-top: 0;
-      font-size: 1.2rem;
+    .leader-name{
+      font-weight:800;
+      text-decoration: underline;
+      text-underline-offset: 2px;
     }
   </style>
 </head>
@@ -171,14 +114,46 @@
 
       <div id="hostNotice" class="notice" style="display:none;"></div>
 
-      <div class="row">
-        <div class="fixed" style="min-width:170px;">
-          <label>Number of groups</label>
-          <input id="hostNumGroups" type="number" min="1" value="4" style="width:170px;"/>
+      <div class="panel">
+        <h3>Group formation</h3>
+
+        <div class="row">
+          <div>
+            <label>Mode</label>
+            <select id="hostMode" onchange="hostModeChanged()">
+              <option value="numGroups">Set number of groups</option>
+              <option value="groupSize">Set target group size</option>
+            </select>
+          </div>
+
+          <div id="mode-numGroups">
+            <label>Number of groups</label>
+            <input id="hostNumGroups" type="number" min="1" value="4"/>
+          </div>
+
+          <div id="mode-groupSize" style="display:none;">
+            <label>Target group size</label>
+            <input id="hostGroupSize" type="number" min="2" value="4"/>
+          </div>
         </div>
-        <div>
-          <label>&nbsp;</label>
-          <button class="btn btn-primary" onclick="hostRandomize()">Randomize Groups</button>
+
+        <div class="row">
+          <div>
+            <label>Group leader</label>
+            <select id="hostLeaderMode">
+              <option value="none">No leader</option>
+              <option value="random">Random leader per group</option>
+            </select>
+          </div>
+
+          <div>
+            <label>&nbsp;</label>
+            <button class="btn btn-primary" onclick="hostRandomize()">Randomize Groups</button>
+          </div>
+        </div>
+
+        <div class="notice" style="margin-top:12px;">
+          <strong>Rule:</strong> if it doesn’t add up, we prefer <strong>even sizes</strong> (groups differ by at most 1).
         </div>
       </div>
 
@@ -197,44 +172,39 @@
   </div>
 
 <script>
-/* ======================================================
-   CONFIG — INSERT YOUR SUPABASE KEYS HERE
-====================================================== */
+/* =================== CONFIG =================== */
 const SUPABASE_URL = "https://uyynxszpmtwfxmnwirjn.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_urtblTmp0Y9ikKCBm-Forg_azXo9iQ6";
-
-// IMPORTANT: don't shadow the global `supabase` object from the CDN.
+const SUPABASE_ANON_KEY = "REPLACE_WITH_YOUR_ANON_KEY"; // rotate if this was ever public
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* GLOBAL SESSION */
 const SESSION_ID = "odce-global-session";
 
-/* localStorage keys */
 const LS_STUDENT_ID = "odce_mixer_student_id";
 const LS_STUDENT_NAME = "odce_mixer_student_name";
 
-/* Detect role */
+/* =================== ROLE / NAV =================== */
 const isHost = new URLSearchParams(location.search).get("host") === "true";
 document.getElementById("roleBadge").textContent = isHost ? "Host" : "Student";
 show(isHost ? "screen-host" : "screen-student");
 
-/* Pre-fill student name */
 if (!isHost) {
   const savedName = localStorage.getItem(LS_STUDENT_NAME);
   if (savedName) document.getElementById("studentNameInput").value = savedName;
 }
 
-/* ======================================================
-   NAVIGATION
-====================================================== */
 function show(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-/* ======================================================
-   NOTICES
-====================================================== */
+/* =================== HOST UI =================== */
+function hostModeChanged() {
+  const mode = document.getElementById("hostMode").value;
+  document.getElementById("mode-numGroups").style.display = (mode === "numGroups") ? "block" : "none";
+  document.getElementById("mode-groupSize").style.display = (mode === "groupSize") ? "block" : "none";
+}
+
+/* =================== NOTICES =================== */
 function setNotice(elId, msg, kind) {
   const el = document.getElementById(elId);
   if (!el) return;
@@ -249,16 +219,12 @@ function setStudentStatus(msg) {
   if (el) el.textContent = msg;
 }
 
-/* ======================================================
-   STUDENT SIGNUP (insert/update based on local device id)
-====================================================== */
+/* =================== STUDENT SIGNUP =================== */
 async function studentSignup() {
   const name = document.getElementById("studentNameInput").value.trim();
   if (!name) return;
 
   localStorage.setItem(LS_STUDENT_NAME, name);
-
-  // If we already signed up on this device, update that record.
   const existingId = localStorage.getItem(LS_STUDENT_ID);
 
   try {
@@ -270,7 +236,6 @@ async function studentSignup() {
         .eq("session", SESSION_ID);
 
       if (error) throw error;
-
       setNotice("studentNotice", `Updated: ${name}`, "ok");
     } else {
       const { data, error } = await supabaseClient
@@ -280,7 +245,6 @@ async function studentSignup() {
         .single();
 
       if (error) throw error;
-
       localStorage.setItem(LS_STUDENT_ID, data.id);
       setNotice("studentNotice", `Signed up: ${name}`, "ok");
     }
@@ -299,21 +263,17 @@ function studentClearLocal() {
   setNotice("studentNotice", "Cleared local identity. You can sign up again.", "ok");
 }
 
-/* ======================================================
-   REALTIME FEEDS (filtered to session)
-====================================================== */
+/* =================== REALTIME =================== */
 let rtStudents = null;
 let rtGroups = null;
 
 async function subscribeRealtime() {
-  // Clean up old channels if hot-reloaded
   if (rtStudents) await supabaseClient.removeChannel(rtStudents);
   if (rtGroups) await supabaseClient.removeChannel(rtGroups);
 
   rtStudents = supabaseClient
     .channel("rt_students_" + SESSION_ID)
-    .on(
-      "postgres_changes",
+    .on("postgres_changes",
       { event: "*", schema: "public", table: "students", filter: "session=eq." + SESSION_ID },
       () => refreshAll()
     )
@@ -321,8 +281,7 @@ async function subscribeRealtime() {
 
   rtGroups = supabaseClient
     .channel("rt_groups_" + SESSION_ID)
-    .on(
-      "postgres_changes",
+    .on("postgres_changes",
       { event: "*", schema: "public", table: "groups", filter: "session=eq." + SESSION_ID },
       () => refreshAll()
     )
@@ -332,9 +291,7 @@ async function subscribeRealtime() {
 }
 subscribeRealtime();
 
-/* ======================================================
-   UI REFRESH
-====================================================== */
+/* =================== REFRESH =================== */
 async function refreshAll() {
   await Promise.all([
     refreshStudentList(),
@@ -382,9 +339,7 @@ async function refreshHostStudentList() {
   area.innerHTML = (data || []).map(s => `<div class="chip">${escapeHtml(s.name)}</div>`).join("");
 }
 
-/* ======================================================
-   GROUP RANDOMIZATION
-====================================================== */
+/* =================== GROUPING LOGIC =================== */
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -394,16 +349,38 @@ function shuffle(arr) {
   return a;
 }
 
+// Prefer even sizes: group sizes differ by at most 1.
+function computeSizesForNGroups(total, nGroups) {
+  nGroups = Math.max(1, Math.min(nGroups, total)); // no empty groups unless total=0
+  const base = Math.floor(total / nGroups);
+  const rem = total % nGroups;
+  // First 'rem' groups get +1 -> sizes differ by at most 1 (as even as possible)
+  return Array.from({length: nGroups}, (_, i) => base + (i < rem ? 1 : 0));
+}
+
+// From target group size: choose group count to get close, then even out.
+function computeSizesForTargetSize(total, targetSize) {
+  targetSize = Math.max(1, targetSize);
+  if (total === 0) return [];
+  let nGroups = Math.round(total / targetSize);
+  nGroups = Math.max(1, Math.min(nGroups, total));
+  return computeSizesForNGroups(total, nGroups);
+}
+
+function pickLeader(members) {
+  if (!members || members.length === 0) return null;
+  return members[Math.floor(Math.random() * members.length)];
+}
+
+/* =================== HOST RANDOMIZE =================== */
 async function hostRandomize() {
   if (!isHost) return;
   setNotice("hostNotice", "", "");
 
-  const n = Math.max(1, parseInt(document.getElementById("hostNumGroups").value || "1", 10));
-
   try {
     const { data: students, error: stErr } = await supabaseClient
       .from("students")
-      .select("id,name")
+      .select("name")
       .eq("session", SESSION_ID);
 
     if (stErr) throw stErr;
@@ -413,51 +390,62 @@ async function hostRandomize() {
     }
 
     const names = shuffle(students.map(s => s.name));
-    const groupSizes = balancedGroupSizes(names.length, n);
+    const mode = document.getElementById("hostMode").value;
+    const leaderMode = document.getElementById("hostLeaderMode").value;
+
+    let sizes = [];
+    let nGroups = 1;
+
+    if (mode === "numGroups") {
+      nGroups = Math.max(1, parseInt(document.getElementById("hostNumGroups").value || "1", 10));
+      sizes = computeSizesForNGroups(names.length, nGroups);
+      nGroups = sizes.length;
+    } else {
+      const targetSize = Math.max(2, parseInt(document.getElementById("hostGroupSize").value || "2", 10));
+      sizes = computeSizesForTargetSize(names.length, targetSize);
+      nGroups = sizes.length;
+    }
 
     const groups = [];
     let idx = 0;
 
-    for (let g = 1; g <= n; g++) {
-      const take = groupSizes[g - 1];
+    for (let g = 1; g <= nGroups; g++) {
+      const take = sizes[g - 1];
+      const members = names.slice(idx, idx + take);
+      idx += take;
+
       groups.push({
         session: SESSION_ID,
         group_number: g,
-        members: names.slice(idx, idx + take)
+        members,
+        leader: (leaderMode === "random") ? pickLeader(members) : null
       });
-      idx += take;
     }
 
-    // Replace groups atomically-ish: delete then insert.
+    // Replace groups: delete then insert
     const { error: delErr } = await supabaseClient.from("groups").delete().eq("session", SESSION_ID);
     if (delErr) throw delErr;
 
     const { error: insErr } = await supabaseClient.from("groups").insert(groups);
     if (insErr) throw insErr;
 
-    setNotice("hostNotice", `Created ${n} groups for ${names.length} students.`, "ok");
+    const sizeSummary = sizes.join(", ");
+    setNotice(
+      "hostNotice",
+      `Created ${nGroups} groups for ${names.length} students. Sizes: [${sizeSummary}]. Leaders: ${leaderMode === "random" ? "random" : "none"}.`,
+      "ok"
+    );
   } catch (e) {
     console.error(e);
     setNotice("hostNotice", `Randomize failed: ${e.message || e}`, "err");
   }
 }
 
-function balancedGroupSizes(total, nGroups) {
-  // e.g. total=10, n=4 => [3,3,2,2]
-  const base = Math.floor(total / nGroups);
-  const rem = total % nGroups;
-  const sizes = [];
-  for (let i = 0; i < nGroups; i++) sizes.push(base + (i < rem ? 1 : 0));
-  return sizes;
-}
-
-/* ======================================================
-   GROUP DISPLAY + student own group
-====================================================== */
+/* =================== GROUP DISPLAY (incl leader) =================== */
 async function refreshGroups() {
   const { data: groups, error } = await supabaseClient
     .from("groups")
-    .select("group_number,members")
+    .select("group_number,members,leader")
     .eq("session", SESSION_ID)
     .order("group_number", { ascending: true });
 
@@ -472,25 +460,14 @@ async function refreshGroups() {
   // Host grid
   if (isHost) {
     const hostGrid = document.getElementById("hostGroupsGrid");
-    hostGrid.innerHTML = safeGroups.map(g => `
-      <div class="group-card">
-        <h3>Group ${g.group_number}</h3>
-        ${(g.members || []).map(m => `<div>${escapeHtml(m)}</div>`).join("")}
-      </div>
-    `).join("");
+    hostGrid.innerHTML = safeGroups.map(g => renderGroupCard(g)).join("");
   }
 
   // Student grid
   const stGrid = document.getElementById("studentGroupsGrid");
-  if (stGrid) {
-    stGrid.innerHTML = safeGroups.map(g => `
-      <div class="group-card">
-        <h3>Group ${g.group_number}</h3>
-        ${(g.members || []).map(m => `<div>${escapeHtml(m)}</div>`).join("")}
-      </div>
-    `).join("");
-  }
+  if (stGrid) stGrid.innerHTML = safeGroups.map(g => renderGroupCard(g)).join("");
 
+  // Student: show own group + leader outcome
   if (!isHost) {
     const myName = localStorage.getItem(LS_STUDENT_NAME);
     const hasGroups = safeGroups.length > 0;
@@ -500,21 +477,24 @@ async function refreshGroups() {
       return;
     }
 
-    let myGroupNum = null;
+    let myGroup = null;
     for (const g of safeGroups) {
-      if ((g.members || []).includes(myName)) {
-        myGroupNum = g.group_number;
-        break;
-      }
+      if ((g.members || []).includes(myName)) { myGroup = g; break; }
     }
 
-    if (myGroupNum != null) {
+    if (myGroup) {
       setStudentStatus("Groups are ready.");
       show("screen-student-result");
+
+      const leaderLine = myGroup.leader
+        ? `<div class="leader-badge">Leader: <span class="leader-name">${escapeHtml(myGroup.leader)}</span></div>`
+        : `<div class="leader-badge">Leader: <span style="opacity:.9;">(none selected)</span></div>`;
+
       document.getElementById("myGroupBox").innerHTML = `
         <div class="group-card" style="background:var(--turquoise)">
-          <h3>You are in Group ${myGroupNum}</h3>
-          <div class="muted" style="color: rgba(255,255,255,0.9); font-weight:600;">Signed in as: ${escapeHtml(myName)}</div>
+          <h3>You are in Group ${myGroup.group_number}</h3>
+          <div style="font-weight:600; opacity:.95;">Signed in as: ${escapeHtml(myName)}</div>
+          ${leaderLine}
         </div>`;
     } else {
       setStudentStatus(hasGroups ? "Groups are ready — you are not found. Check spelling or re-signup." : "Waiting for host to create groups…");
@@ -522,9 +502,25 @@ async function refreshGroups() {
   }
 }
 
-/* ======================================================
-   HOST RESET
-====================================================== */
+function renderGroupCard(g) {
+  const members = (g.members || []);
+  const leader = g.leader || null;
+
+  return `
+    <div class="group-card">
+      <h3>Group ${g.group_number}</h3>
+      ${members.map(m => {
+        const isLeader = leader && m === leader;
+        return `<div${isLeader ? ' class="leader-name"' : ""}>${escapeHtml(m)}${isLeader ? " (Leader)" : ""}</div>`;
+      }).join("")}
+      <div class="leader-badge">
+        Leader: ${leader ? `<span class="leader-name">${escapeHtml(leader)}</span>` : `<span style="opacity:.9;">none</span>`}
+      </div>
+    </div>
+  `;
+}
+
+/* =================== RESET =================== */
 async function hostReset() {
   if (!isHost) return;
   if (!confirm("Reset all students and groups (global session)?")) return;
@@ -544,9 +540,7 @@ async function hostReset() {
   }
 }
 
-/* ======================================================
-   UTIL
-====================================================== */
+/* =================== UTIL =================== */
 function escapeHtml(str) {
   return String(str || "")
     .replaceAll("&", "&amp;")
@@ -556,5 +550,12 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 </script>
+
+<!-- IMPORTANT DB NOTE:
+To store leader, your Supabase table `groups` needs a column:
+  leader text null
+If you don't have it yet, run:
+  alter table public.groups add column if not exists leader text;
+-->
 </body>
 </html>
