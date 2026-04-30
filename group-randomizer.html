@@ -20,12 +20,15 @@
       --red: #FF4F4F;
       --white: #ffffff;
       --light: #f8fafe;
+      --text: #0b1020;
+      --muted: rgba(11,16,32,0.72);
     }
 
     body {
       margin: 0;
       font-family: Poppins, sans-serif;
       background: var(--white);
+      color: var(--text);
     }
 
     #header {
@@ -52,11 +55,14 @@
     input {
       width: 100%;
       padding: 14px;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       border: 2px solid #ccc;
       border-radius: 12px;
       margin-bottom: 18px;
+      box-sizing: border-box;
     }
+
+    label { display:block; font-weight:600; margin: 8px 0 8px; }
 
     .btn {
       width: 100%;
@@ -72,6 +78,10 @@
     .btn-outline { background: transparent; border: 2px solid var(--blue); color: var(--blue); }
     .btn-danger { background: var(--red); color: white; }
 
+    .row { display:flex; gap: 12px; align-items:center; flex-wrap: wrap; }
+    .row > * { flex: 1; }
+    .row .fixed { flex: 0 0 auto; }
+
     .chip {
       display: inline-flex;
       background: var(--blue);
@@ -82,6 +92,19 @@
       font-size: 0.9rem;
       font-weight: 600;
     }
+
+    .muted { color: var(--muted); }
+
+    .notice {
+      margin: 12px 0 18px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--light);
+      border: 1px solid rgba(0,0,0,0.08);
+      font-size: 0.95rem;
+    }
+    .notice.ok { border-color: rgba(90,255,197,0.55); }
+    .notice.err { border-color: rgba(255,79,79,0.6); }
 
     .groups-grid {
       display: grid;
@@ -104,26 +127,31 @@
 </head>
 
 <body>
-  <!-- HEADER -->
   <div id="header">
     <div>ODCE Group Mixer</div>
     <div id="roleBadge"></div>
   </div>
 
-  <!-- MAIN APP -->
   <div id="app">
 
     <!-- STUDENT SIGNUP -->
     <div id="screen-student" class="screen">
       <h2>Join the session</h2>
-      <p>Enter your name to appear in the list.</p>
+      <p class="muted">Enter your name to appear in the list. If you re-enter a name, it updates your existing signup on this device.</p>
+
+      <div id="studentNotice" class="notice" style="display:none;"></div>
 
       <input id="studentNameInput" placeholder="Your name…"/>
 
-      <button onclick="studentSignup()" class="btn btn-primary">Sign Up</button>
+      <button onclick="studentSignup()" class="btn btn-primary">Sign Up / Update</button>
+      <button onclick="studentClearLocal()" class="btn btn-outline">Forget me on this device</button>
 
       <h3 style="margin-top:36px;">Signed Up</h3>
       <div id="studentList"></div>
+
+      <div style="margin-top:24px;" class="notice">
+        <div><strong>Status:</strong> <span id="studentStatus">Waiting for host to create groups…</span></div>
+      </div>
     </div>
 
     <!-- STUDENT RESULT -->
@@ -131,7 +159,9 @@
       <h2>Your Group</h2>
       <div id="myGroupBox" style="margin-bottom: 24px;"></div>
 
-      <h3>All Groups</h3>
+      <button onclick="show('screen-student')" class="btn btn-outline">Back</button>
+
+      <h3 style="margin-top:28px;">All Groups</h3>
       <div id="studentGroupsGrid" class="groups-grid"></div>
     </div>
 
@@ -139,13 +169,25 @@
     <div id="screen-host" class="screen">
       <h2>Host Panel</h2>
 
-      <label>Number of groups</label>
-      <input id="hostNumGroups" type="number" min="1" value="4" style="width:140px;"/>
+      <div id="hostNotice" class="notice" style="display:none;"></div>
 
-      <button class="btn btn-primary" onclick="hostRandomize()">Randomize Groups</button>
-      <button class="btn btn-outline" onclick="hostReset()">Reset Session</button>
+      <div class="row">
+        <div class="fixed" style="min-width:170px;">
+          <label>Number of groups</label>
+          <input id="hostNumGroups" type="number" min="1" value="4" style="width:170px;"/>
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" onclick="hostRandomize()">Randomize Groups</button>
+        </div>
+      </div>
 
-      <h3 style="margin-top:36px;">Students</h3>
+      <div class="row">
+        <button class="btn btn-outline" onclick="refreshAll()">Refresh</button>
+        <button class="btn btn-danger" onclick="hostReset()">Reset Session</button>
+      </div>
+
+      <h3 style="margin-top:28px;">Students</h3>
       <div id="hostStudentList"></div>
 
       <h3 style="margin-top:28px;">Groups</h3>
@@ -160,16 +202,27 @@
 ====================================================== */
 const SUPABASE_URL = "https://YOURPROJECTID.supabase.co";
 const SUPABASE_ANON_KEY = "YOUR-ANON-KEY";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* GLOBAL SESSION (you requested global session) */
+// IMPORTANT: don't shadow the global `supabase` object from the CDN.
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* GLOBAL SESSION */
 const SESSION_ID = "odce-global-session";
+
+/* localStorage keys */
+const LS_STUDENT_ID = "odce_mixer_student_id";
+const LS_STUDENT_NAME = "odce_mixer_student_name";
 
 /* Detect role */
 const isHost = new URLSearchParams(location.search).get("host") === "true";
 document.getElementById("roleBadge").textContent = isHost ? "Host" : "Student";
 show(isHost ? "screen-host" : "screen-student");
 
+/* Pre-fill student name */
+if (!isHost) {
+  const savedName = localStorage.getItem(LS_STUDENT_NAME);
+  if (savedName) document.getElementById("studentNameInput").value = savedName;
+}
 
 /* ======================================================
    NAVIGATION
@@ -179,179 +232,328 @@ function show(id) {
   document.getElementById(id).classList.add("active");
 }
 
+/* ======================================================
+   NOTICES
+====================================================== */
+function setNotice(elId, msg, kind) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (!msg) { el.style.display = "none"; el.textContent = ""; el.className = "notice"; return; }
+  el.style.display = "block";
+  el.textContent = msg;
+  el.className = "notice " + (kind || "");
+}
+
+function setStudentStatus(msg) {
+  const el = document.getElementById("studentStatus");
+  if (el) el.textContent = msg;
+}
 
 /* ======================================================
-   STUDENT SIGNUP
+   STUDENT SIGNUP (insert/update based on local device id)
 ====================================================== */
 async function studentSignup() {
   const name = document.getElementById("studentNameInput").value.trim();
   if (!name) return;
 
-  await supabase.from("students").insert({
-    session: SESSION_ID,
-    name
-  });
+  localStorage.setItem(LS_STUDENT_NAME, name);
 
-  document.getElementById("studentNameInput").value = "";
+  // If we already signed up on this device, update that record.
+  const existingId = localStorage.getItem(LS_STUDENT_ID);
+
+  try {
+    if (existingId) {
+      const { error } = await supabaseClient
+        .from("students")
+        .update({ name })
+        .eq("id", existingId)
+        .eq("session", SESSION_ID);
+
+      if (error) throw error;
+
+      setNotice("studentNotice", `Updated: ${name}`, "ok");
+    } else {
+      const { data, error } = await supabaseClient
+        .from("students")
+        .insert({ session: SESSION_ID, name })
+        .select("id")
+        .single();
+
+      if (error) throw error;
+
+      localStorage.setItem(LS_STUDENT_ID, data.id);
+      setNotice("studentNotice", `Signed up: ${name}`, "ok");
+    }
+  } catch (e) {
+    console.error(e);
+    setNotice("studentNotice", `Signup failed: ${e.message || e}`, "err");
+  }
 }
 
+function studentClearLocal() {
+  if (!confirm("Forget your saved identity on this device? (Does not delete you from Supabase.)")) return;
+  localStorage.removeItem(LS_STUDENT_ID);
+  localStorage.removeItem(LS_STUDENT_NAME);
+  const inp = document.getElementById("studentNameInput");
+  if (inp) inp.value = "";
+  setNotice("studentNotice", "Cleared local identity. You can sign up again.", "ok");
+}
 
 /* ======================================================
-   REALTIME FEEDS
+   REALTIME FEEDS (filtered to session)
 ====================================================== */
+let rtStudents = null;
+let rtGroups = null;
+
 async function subscribeRealtime() {
-  supabase.channel("students")
-    .on("postgres_changes", { event: "*", table: "students" }, refreshAll)
+  // Clean up old channels if hot-reloaded
+  if (rtStudents) await supabaseClient.removeChannel(rtStudents);
+  if (rtGroups) await supabaseClient.removeChannel(rtGroups);
+
+  rtStudents = supabaseClient
+    .channel("rt_students_" + SESSION_ID)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "students", filter: "session=eq." + SESSION_ID },
+      () => refreshAll()
+    )
     .subscribe();
 
-  supabase.channel("groups")
-    .on("postgres_changes", { event: "*", table: "groups" }, refreshAll)
+  rtGroups = supabaseClient
+    .channel("rt_groups_" + SESSION_ID)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "groups", filter: "session=eq." + SESSION_ID },
+      () => refreshAll()
+    )
     .subscribe();
 
   refreshAll();
 }
 subscribeRealtime();
 
-
 /* ======================================================
    UI REFRESH
 ====================================================== */
 async function refreshAll() {
-  refreshStudentList();
-  refreshHostStudentList();
-  refreshGroups();
+  await Promise.all([
+    refreshStudentList(),
+    refreshHostStudentList(),
+    refreshGroups()
+  ]);
 }
 
 async function refreshStudentList() {
-  const { data } = await supabase
-    .from("students")
-    .select("*")
-    .eq("session", SESSION_ID)
-    .order("created_at");
-
   const area = document.getElementById("studentList");
   if (!area) return;
 
-  area.innerHTML = data.map(s => `<div class="chip">${s.name}</div>`).join("");
+  const { data, error } = await supabaseClient
+    .from("students")
+    .select("id,name,created_at")
+    .eq("session", SESSION_ID)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    area.innerHTML = `<div class="muted">Error loading students.</div>`;
+    return;
+  }
+
+  area.innerHTML = (data || []).map(s => `<div class="chip">${escapeHtml(s.name)}</div>`).join("");
 }
 
 async function refreshHostStudentList() {
   if (!isHost) return;
 
-  const { data } = await supabase
-    .from("students")
-    .select("*")
-    .eq("session", SESSION_ID)
-    .order("created_at");
-
   const area = document.getElementById("hostStudentList");
-  area.innerHTML = data.map(s => `<div class="chip">${s.name}</div>`).join("");
-}
 
+  const { data, error } = await supabaseClient
+    .from("students")
+    .select("id,name,created_at")
+    .eq("session", SESSION_ID)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    area.innerHTML = `<div class="muted">Error loading students.</div>`;
+    return;
+  }
+
+  area.innerHTML = (data || []).map(s => `<div class="chip">${escapeHtml(s.name)}</div>`).join("");
+}
 
 /* ======================================================
    GROUP RANDOMIZATION
 ====================================================== */
 function shuffle(arr) {
   const a = [...arr];
-  for (let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
 }
 
 async function hostRandomize() {
-  const n = parseInt(document.getElementById("hostNumGroups").value);
+  if (!isHost) return;
+  setNotice("hostNotice", "", "");
 
-  const { data: students } = await supabase
-    .from("students")
-    .select("*")
-    .eq("session", SESSION_ID);
+  const n = Math.max(1, parseInt(document.getElementById("hostNumGroups").value || "1", 10));
 
-  if (!students.length) return;
+  try {
+    const { data: students, error: stErr } = await supabaseClient
+      .from("students")
+      .select("id,name")
+      .eq("session", SESSION_ID);
 
-  const names = shuffle(students.map(s => s.name));
-  const size = Math.ceil(names.length / n);
+    if (stErr) throw stErr;
+    if (!students || students.length === 0) {
+      setNotice("hostNotice", "No students signed up yet.", "err");
+      return;
+    }
 
-  const groups = [];
-  let idx = 0;
+    const names = shuffle(students.map(s => s.name));
+    const groupSizes = balancedGroupSizes(names.length, n);
 
-  for (let g = 1; g <= n; g++) {
-    groups.push({
-      session: SESSION_ID,
-      group_number: g,
-      members: names.slice(idx, idx + size)
-    });
-    idx += size;
+    const groups = [];
+    let idx = 0;
+
+    for (let g = 1; g <= n; g++) {
+      const take = groupSizes[g - 1];
+      groups.push({
+        session: SESSION_ID,
+        group_number: g,
+        members: names.slice(idx, idx + take)
+      });
+      idx += take;
+    }
+
+    // Replace groups atomically-ish: delete then insert.
+    const { error: delErr } = await supabaseClient.from("groups").delete().eq("session", SESSION_ID);
+    if (delErr) throw delErr;
+
+    const { error: insErr } = await supabaseClient.from("groups").insert(groups);
+    if (insErr) throw insErr;
+
+    setNotice("hostNotice", `Created ${n} groups for ${names.length} students.`, "ok");
+  } catch (e) {
+    console.error(e);
+    setNotice("hostNotice", `Randomize failed: ${e.message || e}`, "err");
   }
-
-  await supabase.from("groups").delete().eq("session", SESSION_ID);
-  for (const g of groups) await supabase.from("groups").insert(g);
 }
 
+function balancedGroupSizes(total, nGroups) {
+  // e.g. total=10, n=4 => [3,3,2,2]
+  const base = Math.floor(total / nGroups);
+  const rem = total % nGroups;
+  const sizes = [];
+  for (let i = 0; i < nGroups; i++) sizes.push(base + (i < rem ? 1 : 0));
+  return sizes;
+}
 
 /* ======================================================
-   GROUP DISPLAY
+   GROUP DISPLAY + student own group
 ====================================================== */
 async function refreshGroups() {
-  const { data: groups } = await supabase
+  const { data: groups, error } = await supabaseClient
     .from("groups")
-    .select("*")
+    .select("group_number,members")
     .eq("session", SESSION_ID)
-    .order("group_number");
+    .order("group_number", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    if (!isHost) setStudentStatus("Error loading groups.");
+    return;
+  }
+
+  const safeGroups = groups || [];
 
   // Host grid
   if (isHost) {
     const hostGrid = document.getElementById("hostGroupsGrid");
-    hostGrid.innerHTML = groups.map(g => `
+    hostGrid.innerHTML = safeGroups.map(g => `
       <div class="group-card">
         <h3>Group ${g.group_number}</h3>
-        ${g.members.map(m => `<div>${m}</div>`).join("")}
+        ${(g.members || []).map(m => `<div>${escapeHtml(m)}</div>`).join("")}
       </div>
     `).join("");
   }
 
-  // Student display
+  // Student grid
   const stGrid = document.getElementById("studentGroupsGrid");
   if (stGrid) {
-    stGrid.innerHTML = groups.map(g => `
+    stGrid.innerHTML = safeGroups.map(g => `
       <div class="group-card">
         <h3>Group ${g.group_number}</h3>
-        ${g.members.map(m => `<div>${m}</div>`).join("")}
+        ${(g.members || []).map(m => `<div>${escapeHtml(m)}</div>`).join("")}
       </div>
     `).join("");
   }
 
-  // Detect student's own group
   if (!isHost) {
-    const myName = document.getElementById("studentNameInput")?.value.trim() || null;
-    let myGroup = null;
-    groups.forEach(g => {
-      if (g.members.includes(myName)) myGroup = g.group_number;
-    });
+    const myName = localStorage.getItem(LS_STUDENT_NAME);
+    const hasGroups = safeGroups.length > 0;
 
-    if (myGroup) {
+    if (!myName) {
+      setStudentStatus(hasGroups ? "Groups exist — please sign up so we can show yours." : "Waiting for host to create groups…");
+      return;
+    }
+
+    let myGroupNum = null;
+    for (const g of safeGroups) {
+      if ((g.members || []).includes(myName)) {
+        myGroupNum = g.group_number;
+        break;
+      }
+    }
+
+    if (myGroupNum != null) {
+      setStudentStatus("Groups are ready.");
       show("screen-student-result");
       document.getElementById("myGroupBox").innerHTML = `
         <div class="group-card" style="background:var(--turquoise)">
-          <h3>You are in Group ${myGroup}</h3>
+          <h3>You are in Group ${myGroupNum}</h3>
+          <div class="muted" style="color: rgba(255,255,255,0.9); font-weight:600;">Signed in as: ${escapeHtml(myName)}</div>
         </div>`;
+    } else {
+      setStudentStatus(hasGroups ? "Groups are ready — you are not found. Check spelling or re-signup." : "Waiting for host to create groups…");
     }
   }
 }
-
 
 /* ======================================================
    HOST RESET
 ====================================================== */
 async function hostReset() {
-  if (!confirm("Reset all students and groups?")) return;
+  if (!isHost) return;
+  if (!confirm("Reset all students and groups (global session)?")) return;
 
-  await supabase.from("students").delete().eq("session", SESSION_ID);
-  await supabase.from("groups").delete().eq("session", SESSION_ID);
+  try {
+    const { error: stErr } = await supabaseClient.from("students").delete().eq("session", SESSION_ID);
+    if (stErr) throw stErr;
 
-  refreshAll();
+    const { error: grErr } = await supabaseClient.from("groups").delete().eq("session", SESSION_ID);
+    if (grErr) throw grErr;
+
+    setNotice("hostNotice", "Session reset.", "ok");
+    refreshAll();
+  } catch (e) {
+    console.error(e);
+    setNotice("hostNotice", `Reset failed: ${e.message || e}`, "err");
+  }
+}
+
+/* ======================================================
+   UTIL
+====================================================== */
+function escapeHtml(str) {
+  return String(str || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 </script>
 </body>
